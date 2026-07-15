@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gustavo López — Learning Experience Designer</title>
+<meta name="description" content="Gustavo López — instructional design, technical writing, multimedia production, AI-assisted workflows, photography, and storytelling, built into learning people actually finish.">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#F7F9FC;
+  --bg-1:#FBFCFE;
+  --surface:#FFFFFF;
+  --surface-2:#F1F4F9;
+  --line:#E4E9F1;
+  --line-soft:#ECEFF5;
+  --text-hi:#1F2937;
+  --text-mid:#5B6472;
+  --text-low:#8A93A3;
+  --accent:#3E63DD;
+  --accent-dim:#2947A8;
+  --accent-glow:rgba(62,99,221,0.20);
+  --accent-soft:rgba(62,99,221,0.08);
+  --radius-sm:8px;
+  --radius-md:14px;
+  --radius-lg:22px;
+  --shadow-sm:0 1px 2px rgba(16,24,40,0.05);
+  --shadow-md:0 12px 28px -12px rgba(16,24,40,0.14);
+  --shadow-lg:0 30px 70px -24px rgba(16,24,40,0.20);
+  --ff-display: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --ff-body: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --ff-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  --ease: cubic-bezier(.22,1,.36,1);
+  --content-width:640px;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important;}
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text-hi);
+  font-family:var(--ff-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+h1,h2,h3,h4{margin:0;font-family:var(--ff-display);letter-spacing:-0.02em;}
+p{margin:0;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+@media (max-width:640px){.wrap{padding:0 20px;}}
+
+.eyebrow{
+  font-family:var(--ff-mono);
+  font-size:12.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+.eyebrow::before{
+  content:"";
+  width:22px;height:1px;
+  background:var(--accent);
+  display:inline-block;
+}
+
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px;}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:18px 0;
+  transition:padding .35s var(--ease), background .35s var(--ease), border-color .35s var(--ease);
+  border-bottom:1px solid transparent;
+}
+.nav.scrolled{
+  padding:12px 0;
+  background:rgba(247,249,252,0.82);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  max-width:1180px; margin:0 auto;padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+@media (max-width:640px){.nav-inner{padding:0 20px;}}
+.nav-mark{
+  font-family:var(--ff-mono);
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.02em;
+  display:flex;align-items:center;gap:9px;
+  color:var(--text-hi);
+}
+.nav-mark .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 10px 2px var(--accent-glow);
+}
+.nav-links{
+  display:flex;align-items:center;gap:2px;
+  list-style:none;margin:0;padding:0;
+}
+.nav-links a{
+  font-size:13.5px;
+  color:var(--text-mid);
+  padding:9px 14px;
+  border-radius:20px;
+  transition:color .25s, background .25s;
+  position:relative;
+}
+.nav-links a:hover{color:var(--text-hi);background:var(--surface-2);}
+.nav-links a.active{color:var(--accent);}
+.nav-cta{
+  font-family:var(--ff-mono);
+  font-size:12.5px;
+  color:#fff;
+  background:var(--accent);
+  padding:9px 16px;
+  border-radius:20px;
+  font-weight:600;
+  transition:transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 10px 24px -8px var(--accent-glow);}
+
+.burger{
+  display:none;
+  width:38px;height:38px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface);
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:4px;
+}
+.burger span{width:16px;height:1.5px;background:var(--text-hi);transition:transform .3s var(--ease), opacity .3s var(--ease);}
+.burger.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+
+.mobile-menu{
+  position:fixed;inset:0;z-index:99;
+  background:rgba(247,249,252,0.98);
+  backdrop-filter:blur(10px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  opacity:0;pointer-events:none;
+  transition:opacity .35s var(--ease);
+}
+.mobile-menu.open{opacity:1;pointer-events:auto;}
+.mobile-menu a{font-size:26px;font-family:var(--ff-display);color:var(--text-hi);padding:14px 0;}
+.mobile-menu a:hover{color:var(--accent);}
+
+@media (max-width:900px){
+  .nav-links,.nav-cta{display:none;}
+  .burger{display:flex;}
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  padding:140px 0 80px;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(60% 50% at 78% 18%, rgba(62,99,221,0.10), transparent 60%),
+    radial-gradient(45% 40% at 10% 90%, rgba(62,99,221,0.06), transparent 60%),
+    linear-gradient(180deg, var(--bg-1), var(--bg));
+}
+.hero-glow{
+  position:absolute;
+  width:520px;height:520px;
+  border-radius:50%;
+  background:radial-gradient(circle, var(--accent-glow), transparent 70%);
+  filter:blur(10px);
+  top:-140px;right:-120px;
+  z-index:0;
+  opacity:.6;
+  pointer-events:none;
+  transition:transform .3s ease-out;
+}
+#pathCanvas{
+  position:absolute;inset:0;z-index:1;
+  width:100%;height:100%;
+  opacity:.8;
+}
+.hero-inner{
+  position:relative;z-index:2;
+  width:100%;
+}
+.hero-kicker{
+  font-family:var(--ff-mono);
+  font-size:13px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:26px;
+  display:flex;align-items:center;gap:10px;
+}
+.hero-kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px 2px var(--accent-glow);}
+.hero h1{
+  font-size:clamp(44px, 7.4vw, 88px);
+  font-weight:700;
+  line-height:1.0;
+  max-width:15ch;
+  color:var(--text-hi);
+}
+.hero-sub{
+  margin-top:22px;
+  font-size:clamp(15px,2vw,18px);
+  color:var(--text-mid);
+  font-family:var(--ff-mono);
+  max-width:var(--content-width);
+  letter-spacing:-.01em;
+}
+.hero-sub b{color:var(--text-hi);font-weight:600;}
+.hero-value{
+  margin-top:26px;
+  font-size:19px;
+  color:var(--text-mid);
+  max-width:var(--content-width);
+  line-height:1.7;
+}
+.hero-value strong{color:var(--text-hi);font-weight:600;}
+.hero-actions{
+  margin-top:44px;
+  display:flex;gap:14px;flex-wrap:wrap;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 26px;
+  border-radius:10px;
+  font-size:14.5px;
+  font-weight:600;
+  transition:transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease), border-color .25s;
+  border:1px solid transparent;
+}
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+  box-shadow:var(--shadow-md);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 36px -12px var(--accent-glow);}
+.btn-ghost{
+  background:var(--surface);
+  border-color:var(--line);
+  color:var(--text-hi);
+  box-shadow:var(--shadow-sm);
+}
+.btn-ghost:hover{border-color:var(--accent-dim);transform:translateY(-2px);background:var(--surface-2);}
+.btn svg{width:15px;height:15px;}
+
+.scroll-indicator{
+  position:absolute;
+  bottom:36px;left:32px;
+  z-index:2;
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--ff-mono);
+  font-size:11px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-low);
+}
+.scroll-line{
+  width:1px;height:44px;
+  background:linear-gradient(var(--accent), transparent);
+  position:relative;
+  overflow:hidden;
+}
+.scroll-line::after{
+  content:"";
+  position:absolute;top:-100%;left:0;width:100%;height:100%;
+  background:var(--accent);
+  animation:scrollDown 2s var(--ease) infinite;
+}
+@keyframes scrollDown{
+  0%{top:-100%;}
+  60%{top:100%;}
+  100%{top:100%;}
+}
+
+/* ============================================================
+   SECTION SHARED
+   ============================================================ */
+section{position:relative;padding:120px 0;}
+@media (max-width:640px){section{padding:88px 0;}}
+.section-head{
+    max-width:var(--content-width);
+    margin-bottom:64px;
+}
+.section-head h2{
+  font-size:clamp(30px,4.4vw,44px);
+  font-weight:700;
+}
+.section-head p{
+  margin-top:16px;
+  color:var(--text-mid);
+  font-size:16.5px;
+  line-height:1.7;
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .8s var(--ease), transform .8s var(--ease);
+}
+.reveal.in{opacity:1;transform:translateY(0);}
+
+/* ============================================================
+   BUILD (feature cards)
+   ============================================================ */
+.build-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+@media (max-width:900px){.build-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:560px){.build-grid{grid-template-columns:1fr;}}
+.build-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:32px 28px;
+  box-shadow:var(--shadow-sm);
+  transition:transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s;
+}
+.build-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:var(--accent-dim);}
+.build-icon{
+  width:44px;height:44px;
+  border-radius:11px;
+  background:var(--accent-soft);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--accent);
+  margin-bottom:20px;
+}
+.build-icon svg{width:22px;height:22px;}
+.build-card h3{font-size:18px;font-weight:700;margin-bottom:10px;}
+.build-card p{color:var(--text-mid);font-size:14.5px;line-height:1.65;}
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+.about-grid{
+  display:grid;
+  grid-template-columns:0.85fr 1.15fr;
+  gap:72px;
+  align-items:start;
+}
+@media (max-width:900px){.about-grid{grid-template-columns:1fr;gap:48px;}}
+
+.photo-frame{
+  position:relative;
+  aspect-ratio:4/5;
+  border-radius:var(--radius-lg);
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.photo-placeholder{
+  position:relative;z-index:1;
+  text-align:center;
+  color:var(--text-low);
+  font-family:var(--ff-mono);
+  font-size:12.5px;
+  letter-spacing:.06em;
+}
+.photo-placeholder svg{width:54px;height:54px;margin:0 auto 14px;color:var(--accent);opacity:.6;}
+.photo-frame .corner{
+  position:absolute;width:18px;height:18px;
+  border-color:var(--accent);
+  opacity:.5;
+}
+.corner.tl{top:16px;left:16px;border-top:2px solid;border-left:2px solid;}
+.corner.br{bottom:16px;right:16px;border-bottom:2px solid;border-right:2px solid;}
+
+.about-copy p{color:var(--text-mid);font-size:16.5px;line-height:1.8;}
+.about-copy p + p{margin-top:18px;}
+.about-copy .lede{color:var(--text-hi);font-size:19px;line-height:1.6;}
+
+.problems-head{
+  margin-top:52px;
+  font-family:var(--ff-mono);
+  font-size:11.5px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-low);
+  margin-bottom:16px;
+}
+.problems-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+}
+@media (max-width:520px){.problems-grid{grid-template-columns:1fr;}}
+.problem-cell{
+  background:var(--surface);
+  padding:18px 20px;
+  display:flex;align-items:center;gap:12px;
+  font-size:14.5px;
+  color:var(--text-hi);
+  font-weight:600;
+}
+.problem-cell svg{width:16px;height:16px;color:var(--accent);flex-shrink:0;}
+
+/* ============================================================
+   PROJECTS
+   ============================================================ */
+.module-tag{
+  font-family:var(--ff-mono);
+  font-size:11.5px;
+  letter-spacing:.08em;
+  color:var(--accent-dim);
+  background:var(--accent-soft);
+  border:1px solid rgba(62,99,221,0.22);
+  padding:4px 10px;
+  border-radius:5px;
+  display:inline-block;
+}
+
+.project-list{display:flex;flex-direction:column;gap:28px;}
+.project-card{
+  display:grid;
+  grid-template-columns:1.05fr 1.3fr;
+  gap:0;
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition:border-color .35s var(--ease), transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.project-card:hover{
+  border-color:var(--accent-dim);
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-lg);
+}
+@media (max-width:860px){.project-card{grid-template-columns:1fr;}}
+
+.project-media{
+  position:relative;
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(62,99,221,0.10), transparent 60%),
+    var(--surface-2);
+  min-height:280px;
+  display:flex;align-items:center;justify-content:center;
+  border-right:1px solid var(--line);
+  overflow:hidden;
+}
+@media (max-width:860px){.project-media{border-right:none;border-bottom:1px solid var(--line);min-height:200px;}}
+.project-media svg{width:64px;height:64px;color:var(--accent);opacity:.6;transition:transform .5s var(--ease);}
+.project-card:hover .project-media svg{transform:scale(1.12) rotate(-4deg);}
+.project-media .grid-overlay{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(31,41,55,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(31,41,55,0.04) 1px, transparent 1px);
+  background-size:28px 28px;
+  mask-image:radial-gradient(circle at center, black, transparent 75%);
+}
+
+.project-body{padding:38px 40px;display:flex;flex-direction:column;}
+@media (max-width:640px){.project-body{padding:28px 24px;}}
+.project-body h3{font-size:23px;margin-top:14px;margin-bottom:18px;}
+.project-block{margin-bottom:16px;}
+.project-block h4{
+  font-family:var(--ff-mono);
+  font-size:11px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-low);
+  margin-bottom:6px;
+}
+.project-block p{color:var(--text-mid);font-size:14.5px;line-height:1.65;}
+.project-results{
+  display:flex;flex-wrap:wrap;gap:10px;
+  margin:6px 0 20px;
+}
+.result-chip{
+  font-family:var(--ff-mono);
+  font-size:12.5px;
+  color:var(--accent-dim);
+  background:var(--accent-soft);
+  border:1px solid rgba(62,99,221,0.22);
+  padding:6px 11px;
+  border-radius:20px;
+}
+.tech-row{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin-bottom:24px;
+}
+.tech-pill{
+  font-size:12px;
+  color:var(--text-low);
+  border:1px solid var(--line);
+  padding:5px 10px;
+  border-radius:5px;
+  font-family:var(--ff-mono);
+}
+.project-actions{
+  margin-top:auto;
+  display:flex;gap:12px;flex-wrap:wrap;
+}
+.link-btn{
+  font-size:13.5px;font-weight:600;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 16px;
+  border-radius:8px;
+  border:1px solid var(--line);
+  transition:border-color .25s,color .25s, background .25s;
+}
+.link-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.link-btn.solid{background:var(--surface-2);}
+.link-btn svg{width:13px;height:13px;}
+
+
+
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+.timeline{position:relative;padding-left:0;}
+.tl-line{
+  position:absolute;left:11px;top:6px;bottom:6px;width:1px;
+  background:linear-gradient(var(--accent), var(--line) 90%);
+}
+.tl-item{
+  position:relative;
+  padding-left:44px;
+  margin-bottom:56px;
+}
+.tl-item:last-child{margin-bottom:0;}
+.tl-dot{
+  position:absolute;left:0;top:4px;
+  width:24px;height:24px;
+  border-radius:50%;
+  background:var(--surface);
+  border:1px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+}
+.tl-dot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px 2px var(--accent-glow);}
+.tl-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:6px;}
+.tl-head h3{font-size:20px;}
+.tl-role{font-size:14.5px;color:var(--text-mid);}
+.tl-date{
+  font-family:var(--ff-mono);
+  font-size:12px;
+  color:var(--text-low);
+  margin-left:auto;
+}
+.tl-item ul{margin:14px 0 0;padding-left:18px;color:var(--text-mid);font-size:14.5px;line-height:1.7;}
+.tl-item li{margin-bottom:6px;}
+.tl-item li::marker{color:var(--accent);}
+
+/* ============================================================
+   PHOTOGRAPHY
+   ============================================================ */
+.photo-full{
+  width:100%;
+  position:relative;
+  aspect-ratio:16/7;
+  border-radius:var(--radius-lg);
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+}
+@media (max-width:640px){.photo-full{aspect-ratio:4/5;}}
+.photo-full .photo-placeholder svg{width:60px;height:60px;}
+.photo-caption{
+  max-width:var(--content-width);
+  margin:0 0 40px;
+  text-align:left;
+  font-size:19px;
+  line-height:1.7;
+  color:var(--text-hi);
+  font-family:var(--ff-display);
+}
+.photo-credit{
+  margin:16px auto 0;
+  text-align:center;
+  font-family:var(--ff-mono);
+  font-size:12.5px;
+  color:var(--text-low);
+}
+
+/* ============================================================
+   STORYTELLING
+   ============================================================ */
+.storytelling-inner{
+    max-width:var(--content-width);
+    text-align:left;
+}
+.storytelling-inner h2{font-size:clamp(28px,3.6vw,38px);margin-bottom:20px;}
+.storytelling-inner p{font-size:18px;color:var(--text-mid);line-height:1.7;}
+
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.contact-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:60px;
+}
+.contact-grid{grid-template-columns:1fr;gap:44px;}
+.contact-list{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px;}
+.contact-row{
+  display:inline-flex;align-items:center;gap:12px;
+  width:auto;flex:0 1 auto;
+  padding:12px 18px 12px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface);
+  box-shadow:var(--shadow-sm);
+  transition:border-color .25s, transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.contact-row:hover{border-color:var(--accent-dim);transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.contact-icon{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--accent-soft);
+  border:1px solid rgba(62,99,221,0.2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--accent);flex-shrink:0;
+}
+.contact-icon svg{width:15px;height:15px;}
+.contact-label{display:none;}
+.contact-value{font-size:14px;font-weight:600;white-space:nowrap;}
+
+/* ============================================================
+   SKILLS
+   ============================================================ */
+.skills-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+@media (max-width:860px){.skills-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:520px){.skills-grid{grid-template-columns:1fr;}}
+.skill-card{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:26px 24px;
+  background:var(--surface);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition:border-color .3s, transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.skill-card:hover{border-color:var(--accent-dim);transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.skill-card::after{
+  content:"";
+  position:absolute;left:0;bottom:0;height:2px;width:var(--fill,0%);
+  background:var(--accent);
+  transition:width 1.4s var(--ease);
+}
+.skill-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px;}
+.skill-name{font-size:15.5px;font-weight:600;}
+.skill-level{font-family:var(--ff-mono);font-size:11.5px;color:var(--text-low);flex-shrink:0;}
+.skill-desc{font-size:13px;color:var(--text-mid);line-height:1.55;}
+
+.form-field{margin-bottom:18px;}
+.form-field label{
+  display:block;font-size:12.5px;font-family:var(--ff-mono);
+  color:var(--text-low);margin-bottom:8px;letter-spacing:.03em;
+}
+.form-field input,.form-field textarea{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:13px 14px;
+  color:var(--text-hi);
+  font-family:var(--ff-body);
+  font-size:14.5px;
+  transition:border-color .25s, background .25s;
+}
+.form-field input:focus,.form-field textarea:focus{border-color:var(--accent);outline:none;background:var(--surface-2);}
+.form-field textarea{resize:vertical;min-height:110px;}
+.form-status{
+  margin-top:16px;font-size:13.5px;
+  font-family:var(--ff-mono);
+  color:var(--accent);
+  min-height:18px;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  border-top:1px solid var(--line);
+  padding:40px 0;
+}
+.footer-inner{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.footer-copy{font-size:13px;color:var(--text-low);}
+.footer-links{display:flex;gap:22px;}
+.footer-links a{font-size:13px;color:var(--text-mid);transition:color .2s;}
+.footer-links a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <a href="#home" class="nav-mark"><span class="dot"></span>GL / Learning Experience</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#build">Approach</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#work">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Contact</a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#home">Home</a>
+  <a href="#build">Approach</a>
+  <a href="#about">About</a>
+  <a href="#work">Projects</a>
+  <a href="#skills">Skills</a>
+  <a href="#experience">Experience</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-glow" id="heroGlow"></div>
+  <canvas id="pathCanvas" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+    <p class="hero-kicker"><span class="dot"></span>Available for learning experience roles</p>
+    <h1>Gustavo López</h1>
+    <p class="hero-sub">Learning Experience Designer <b>·</b> Technical Writer <b>·</b> Enablement Specialist</p>
+    <p class="hero-value">I transform complexity into experiences people actually enjoy learning from. Through <strong>instructional design, technical writing, multimedia production, AI-assisted workflows, photography, and storytelling</strong>, I build learning that is clear, memorable, and human.<br><br>Scroll down to learn more about me.</p>
+    <div class="hero-actions">
+      <a href="#work" class="btn btn-primary">Jump to My Work
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="#" class="btn btn-ghost" id="resumeBtn">Download Résumé
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span class="scroll-line"></span>
+    <span>Scroll</span>
+  </div>
+</header>
+
+<main>
+<!-- ============================================================
+     BUILD LIKE A PRODUCT
+     ============================================================ -->
+<section id="build">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Approach</p>
+      <h2>I Build Learning Like a Product</h2>
+      <p>Six disciplines, one goal: learning that people finish, remember, and actually use.</p>
+    </div>
+    <div class="build-grid">
+
+      <div class="build-card reveal">
+        <div class="build-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l9 4.5-9 4.5-9-4.5L12 2z"/><path d="M3 11.5L12 16l9-4.5"/><path d="M3 16.5L12 21l9-4.5"/></svg></div>
+        <h3>Instructional Design</h3>
+        <p>Learning experiences people finish—not just courses.</p>
+      </div>
+
+      <div class="build-card reveal">
+        <div class="build-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6M9 9h1"/></svg></div>
+        <h3>Technical Writing</h3>
+        <p>Documentation that reduces support requests and builds confidence.</p>
+      </div>
+
+      <div class="build-card reveal">
+        <div class="build-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="M17 9l5-3v12l-5-3"/></svg></div>
+        <h3>Multimedia</h3>
+        <p>Video, voice-over, animation and interactive demos.</p>
+      </div>
+
+      <div class="build-card reveal">
+        <div class="build-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/><path d="M5 15l.8 1.8L7.5 17.5l-1.7.8L5 20l-.8-1.7L2.5 17.5l1.7-.7L5 15z"/><path d="M19 14l.9 2 2 .9-2 .9-.9 2-.9-2-2-.9 2-.9.9-2z"/></svg></div>
+        <h3>AI-Assisted Workflows</h3>
+        <p>Rapid research, prototyping, writing and visual production with human judgment.</p>
+      </div>
+
+      <div class="build-card reveal">
+        <div class="build-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <h3>Visual Storytelling</h3>
+        <p>Photography taught me that clarity is visual before it's verbal.</p>
+      </div>
+
+      <div class="build-card reveal">
+        <div class="build-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <h3>Storytelling</h3>
+        <p>People remember stories far longer than instructions.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT
+     ============================================================ -->
+<section id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="reveal">
+        <div class="photo-frame">
+          <span class="corner tl"></span>
+          <span class="corner br"></span>
+          <img
+              src="images/gus.png"
+              alt="Gustavo López"
+              style="width:100%;height:100%;object-fit:cover;">
+        </div>
+      </div>
+      <div class="reveal">
+        <p class="eyebrow">About</p>
+        <h2 style="font-size:clamp(28px,3.6vw,38px);margin-bottom:26px;">I make product knowledge stick.</h2>
+        <div class="about-copy">
+          <p class="lede">I've spent the last five years turning technical complexity into learning people actually retain — first in customer-facing sales and support, now in instructional design for SaaS platforms.</p>
+          <p>At PagerDuty, I built AI-assisted content systems that cut content production time from weeks to days, then used that speed to ship a 13-module onboarding program and a 4-course Runbook Automation certification path. The work translated into over 1,000 enterprise engagements and a 42% lift in trial activation.</p>
+          <p>Before that, I ran sales enablement at Peek, mining Gong call data and Salesforce signals to find where customer-facing teams were actually getting stuck — and building the content to close that gap. My path started in operations at LATAM Airlines, which is where I learned to explain complicated systems to people under pressure, fast.</p>
+        </div>
+        <p class="problems-head">Problems I've Solved</p>
+        <div class="problems-grid">
+          <div class="problem-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Customer onboarding</div>
+          <div class="problem-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Product adoption</div>
+          <div class="problem-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Internal enablement</div>
+          <div class="problem-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Technical documentation</div>
+          <div class="problem-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Product launches</div>
+          <div class="problem-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Interactive simulations</div>
+          <div class="problem-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Video learning</div>
+          <div class="problem-cell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>AI-assisted content creation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROJECTS
+     ============================================================ -->
+<section id="work">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Featured Work</p>
+      <h2>Case modules</h2>
+      <p>Three programs, each built to solve a specific adoption problem — not just to check a training deliverable off a list.</p>
+    </div>
+
+    <div class="project-list">
+
+      <article class="project-card reveal">
+        <div class="project-media">
+          <div class="grid-overlay"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l9 4.5-9 4.5-9-4.5L12 2z"/><path d="M3 6.5v11L12 22l9-4.5v-11"/><path d="M12 11v11"/></svg>
+        </div>
+        <div class="project-body">
+          <span class="module-tag">Module 01 — Onboarding Systems</span>
+          <h3>13-module onboarding program, PagerDuty</h3>
+          <div class="project-block">
+            <h4>Business challenge</h4>
+            <p>New PagerDuty customers were slow to reach first value — platform depth meant the standard doc set couldn't carry activation on its own, and content production couldn't keep pace with release velocity.</p>
+          </div>
+          <div class="project-block">
+            <h4>My role</h4>
+            <p>Instructional designer, owning curriculum architecture, storyboarding, SME interviews, and production across Articulate 360 and Skilljar.</p>
+          </div>
+          <div class="project-block">
+            <h4>Process</h4>
+            <p>Mapped the full customer journey against product complexity, then built an AI-assisted content workflow to draft, iterate, and localize modules faster — reserving human review for accuracy and instructional quality.</p>
+          </div>
+          <div class="project-results">
+            <span class="result-chip">13 modules shipped</span>
+            <span class="result-chip">Faster time-to-value</span>
+          </div>
+          <div class="tech-row">
+            <span class="tech-pill">Articulate Rise 360</span>
+            <span class="tech-pill">Skilljar LMS</span>
+            <span class="tech-pill">Claude / GPT prompt workflows</span>
+          </div>
+          <div class="project-actions">
+            <a href="#" class="link-btn solid">Read Case Study
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#" class="link-btn">Launch Interactive Demo
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card reveal">
+        <div class="project-media">
+          <div class="grid-overlay"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 15a4 4 0 100-8 4 4 0 000 8z"/><path d="M4 12a8 8 0 0116 0"/><path d="M2 20h20"/></svg>
+        </div>
+        <div class="project-body">
+          <span class="module-tag">Module 02 — Certification</span>
+          <h3>Runbook Automation certification path</h3>
+          <div class="project-block">
+            <h4>Business challenge</h4>
+            <p>Automation demand was accelerating, but customers lacked a structured way to build proficiency, which slowed adoption of the platform's more advanced capabilities.</p>
+          </div>
+          <div class="project-block">
+            <h4>My role</h4>
+            <p>Designed and produced the 4-course certification path end to end — curriculum, assessment design, hands-on learning experiences.</p>
+          </div>
+          <div class="project-block">
+            <h4>Process</h4>
+            <p>Partnered directly with product and technical SMEs to validate scenario accuracy, then built scenario-based assessments so certification reflected real operational competence, not just content recall.</p>
+          </div>
+          <div class="project-results">
+            <span class="result-chip">4-course path</span>
+            <span class="result-chip">Scenario-based assessment</span>
+          </div>
+          <div class="tech-row">
+            <span class="tech-pill">Articulate Rise 360</span>
+            <span class="tech-pill">Adobe Premiere / Photoshop / Audition</span>
+            <span class="tech-pill">Skilljar</span>
+          </div>
+          <div class="project-actions">
+            <a href="#" class="link-btn solid">Read Case Study
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#" class="link-btn">Launch Interactive Demo
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card reveal">
+        <div class="project-media">
+          <div class="grid-overlay"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 5-8"/></svg>
+        </div>
+        <div class="project-body">
+          <span class="module-tag">Module 03 — Product Adoption</span>
+          <h3>Interactive product tours &amp; trial activation</h3>
+          <div class="project-block">
+            <h4>Business challenge</h4>
+            <p>Self-serve trial users weren't reaching activation events fast enough, and enterprise prospects needed a low-friction way to evaluate platform depth before a sales conversation.</p>
+          </div>
+          <div class="project-block">
+            <h4>My role</h4>
+            <p>Designed interactive, scenario-based product tours embedded on PagerDuty's public-facing site as the primary self-serve evaluation path for prospects, and repurposed for internal use as quick capability assessments with existing customers.</p>
+          </div>
+          <div class="project-block">
+            <h4>Process</h4>
+            <p>No granular tour-level analytics existed to pinpoint drop-off, so sequencing and messaging decisions were made jointly with a PM — grounded in SME judgment and known friction points — rather than a live dashboard, then checked against downstream activation numbers.</p>
+          </div>
+          <div class="project-results">
+            <span class="result-chip">1,000+ engagements</span>
+            <span class="result-chip">+42% trial activation</span>
+            <span class="result-chip">PM-partnered prioritization</span>
+          </div>
+          <div class="tech-row">
+            <span class="tech-pill">Articulate Rise 360</span>
+            <span class="tech-pill">Product analytics</span>
+            <span class="tech-pill">Skilljar</span>
+          </div>
+          <div class="project-actions">
+            <a href="#" class="link-btn solid">Read Case Study
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#" class="link-btn">Launch Interactive Demo
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SKILLS
+     ============================================================ -->
+<section id="skills">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Capabilities</p>
+      <h2>What I bring to the room</h2>
+      <p>Depth in the craft of instructional design, plus the technical range to ship it without waiting on a production team.</p>
+    </div>
+    <div class="skills-grid" id="skillsGrid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PHOTOGRAPHY
+     ============================================================ -->
+<section id="photography">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Photography</p>
+      <h2>Seeing before writing</h2>
+    </div>
+    <p class="photo-caption reveal" style="margin:0 0 40px;">Photography taught me to remove distractions until only the story remains. The same instinct shapes every learning experience I design — find the one thing that matters, cut what doesn't.</p>
+    <div class="photo-full reveal">
+      <img src="images/photography.jpg" alt="Gustavo López crouched behind police tape, photographing a street scene in Venezuela." style="width:100%;height:100%;object-fit:cover;object-position:center 30%;"></div>
+    <p class="photo-credit reveal">Venezuela, 2007. Photo: Marcia Moreno.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     STORYTELLING
+     ============================================================ -->
+<section id="storytelling">
+    <div class="wrap">
+        <div class="storytelling-inner reveal">    
+    <p class="eyebrow">Storytelling</p>
+    <h2>Narrative first.</h2>
+    <p>I also write fiction. Good learning isn't information—it's narrative.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EXPERIENCE
+     ============================================================ -->
+<section id="experience">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Experience</p>
+      <h2>Career path</h2>
+      <p>From airline operations to sales enablement to instructional design — each role built the judgment for the next.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-line"></div>
+
+      <div class="tl-item reveal">
+        <span class="tl-dot"></span>
+        <div class="tl-head">
+          <h3>PagerDuty</h3>
+          <span class="tl-role">Instructional Designer | Technical Writer</span>
+          <span class="tl-date">Aug 2023 – Jan 2026</span>
+        </div>
+        <ul>
+          <li>Built AI-assisted content systems that cut content production time from weeks to days.</li>
+          <li>Designed a 13-module onboarding program and a 4-course Runbook Automation certification path.</li>
+          <li>Created interactive product tours driving 1,000+ enterprise engagements and a 42% trial activation lift.</li>
+          <li>Co-administered Skilljar LMS — publishing, enrollment, reporting, and permissions.</li>
+          <li>Led localization initiatives and maintained technical accuracy across training assets.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item reveal">
+        <span class="tl-dot"></span>
+        <div class="tl-head">
+          <h3>Peek</h3>
+          <span class="tl-role">Senior Sales Enablement Specialist</span>
+          <span class="tl-date">Dec 2021 – Aug 2023</span>
+        </div>
+        <ul>
+          <li>Mined Gong conversations and Salesforce data to identify knowledge gaps and target content updates.</li>
+          <li>Designed onboarding and enablement resources that shortened ramp time for customer-facing teams.</li>
+          <li>Facilitated live enablement sessions to reinforce new product knowledge and workflows.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item reveal">
+        <span class="tl-dot"></span>
+        <div class="tl-head">
+          <h3>Peek</h3>
+          <span class="tl-role">Business Development Representative</span>
+          <span class="tl-date">Mar 2021 – Nov 2021</span>
+        </div>
+        <ul>
+          <li>Generated and qualified pipeline through prospecting and account research.</li>
+          <li>Built a working understanding of SaaS buyer needs that later shaped enablement content decisions.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item reveal">
+        <span class="tl-dot"></span>
+        <div class="tl-head">
+          <h3>LATAM Airlines</h3>
+          <span class="tl-role">Passenger Care Executive | Sales Executive</span>
+          <span class="tl-date">2014 – 2020</span>
+        </div>
+        <ul>
+          <li>Managed high-pressure operational situations requiring rapid, clear communication.</li>
+          <li>Recognized as a top performer in a high-volume, customer-facing sales environment.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ============================================================
+     CONTACT
+     ============================================================ -->
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="reveal">
+        <p class="eyebrow">Contact</p>
+        <h2 style="font-size:clamp(28px,3.6vw,38px);">Let's talk about your team's next learning problem.</h2>
+        <p style="margin-top:16px;color:var(--text-mid);font-size:16px;line-height:1.7;">Open to Senior Instructional Design, Learning Experience Lead, and Enablement / Education leadership roles at SaaS and AI companies.</p>
+
+        <div class="contact-list">
+          <a class="contact-row" href="mailto:guslopez.enablement@gmail.com">
+            <span class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4V4z"/><path d="M4 6l8 7 8-7"/></svg></span>
+            <span class="contact-value">Email</span>
+          </a>
+          <a class="contact-row" href="https://linkedin.com/in/guslopezgarcia" target="_blank" rel="noopener">
+            <span class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 00-4 0"/></svg></span>
+            <span class="contact-value">LinkedIn</span>
+          </a>
+          <a class="contact-row" href="#" id="resumeBtn2">
+            <span class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></span>
+            <span class="contact-value">Résumé PDF</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <p class="footer-copy">© <span id="year"></span> Gustavo López. Built by hand — HTML, CSS &amp; JavaScript only.</p>
+    <div class="footer-links">
+      <a href="mailto:guslopez.enablement@gmail.com">Email</a>
+      <a href="https://linkedin.com/in/guslopezgarcia" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="#home">Back to top</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Year ---------- */
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ---------- Sticky nav ---------- */
+  var nav = document.getElementById('mainNav');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section, header.hero'));
+  var navAnchors = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+
+  function onScroll(){
+    if(window.scrollY > 40){ nav.classList.add('scrolled'); } else { nav.classList.remove('scrolled'); }
+    updateActiveLink();
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  function updateActiveLink(){
+    var scrollPos = window.scrollY + 140;
+    var current = null;
+    sections.forEach(function(s){
+      if(s.offsetTop <= scrollPos){ current = s.id; }
+    });
+    navAnchors.forEach(function(a){
+      var href = a.getAttribute('href').replace('#','');
+      a.classList.toggle('active', href === current);
+    });
+  }
+
+  /* ---------- Mobile menu ---------- */
+  var burger = document.getElementById('burger');
+  var mobileMenu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', function(){
+    var open = mobileMenu.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  mobileMenu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      mobileMenu.classList.remove('open');
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', false);
+      document.body.style.overflow = '';
+    });
+  });
+
+  /* ---------- Resume download (generates a simple text résumé client-side) ---------- */
+  function downloadResume(){
+    var content = "GUSTAVO LOPEZ\\nInstructional Designer & Learning Experience Designer\\nguslopez.enablement@gmail.com | linkedin.com/in/guslopezgarcia\\n\\n" +
+      "Replace this placeholder action with a link to your actual résumé PDF in /assets/ once you upload the file to your hosting.";
+    var blob = new Blob([content], {type:'text/plain'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'Gustavo-Lopez-Resume.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  document.getElementById('resumeBtn').addEventListener('click', function(e){ e.preventDefault(); downloadResume(); });
+  document.getElementById('resumeBtn2').addEventListener('click', function(e){ e.preventDefault(); downloadResume(); });
+
+  /* ---------- Scroll reveal ---------- */
+  var revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window && !reducedMotion){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15, rootMargin:'0px 0px -60px 0px'});
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in'); });
+  }
+
+/* ---------- Animated counters ---------- */
+  var counters = document.querySelectorAll('.stat-num');
+  function animateCount(el){
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    var suffix = el.getAttribute('data-suffix') || '';
+    var duration = 1400;
+    var start = null;
+    function step(ts){
+      if(!start) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var val = Math.round(target * eased);
+      el.textContent = val.toLocaleString() + suffix;
+      if(progress < 1){ requestAnimationFrame(step); }
+    }
+    if(reducedMotion){ el.textContent = target.toLocaleString() + suffix; return; }
+    requestAnimationFrame(step);
+  }
+  if('IntersectionObserver' in window){
+    var statIo = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          animateCount(entry.target);
+          statIo.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.6});
+    counters.forEach(function(c){ statIo.observe(c); });
+  } else {
+    counters.forEach(animateCount);
+  }
+
+ /* ---------- Skills data + render ---------- */
+  var skills = [
+    {name:'Instructional Design', level:'Expert', desc:'Curriculum architecture, learning objectives, and adult learning principles applied to product education.', fill:96},
+    {name:'AI-Assisted Content Dev.', level:'Expert', desc:'Prompt-engineered workflows with Claude & ChatGPT that cut production time without cutting quality.', fill:94},
+    {name:'Articulate Storyline / Rise', level:'Advanced', desc:'Scenario-based, interactive eLearning builds from storyboard to publish.', fill:88},
+    {name:'Technical Writing', level:'Advanced', desc:'Translating platform-level complexity into documentation people actually read.', fill:90},
+    {name:'LMS Administration', level:'Advanced', desc:'Skilljar publishing, enrollment, reporting, and user permissions.', fill:85},
+    {name:'Video &amp; Audio Production', level:'Proficient', desc:'Premiere and Audition for walkthroughs, narration, and certification media.', fill:78},
+    {name:'Adobe Creative Cloud', level:'Proficient', desc:'Photoshop-based visual assets supporting learning content and brand consistency.', fill:76},
+    {name:'Enablement Strategy', level:'Advanced', desc:'Salesforce, Gong, HubSpot &amp; Outreach used to find where reps and customers get stuck, and to build/refine the workflows that close that gap.', fill:87},
+    {name:'Cross-Functional Partnership', level:'Expert', desc:'Running SME interviews and stakeholder alignment across Product, GTM, and Engineering.', fill:92},
+  ];
+  var grid = document.getElementById('skillsGrid');
+  skills.forEach(function(s, i){
+    var card = document.createElement('div');
+    card.className = 'skill-card reveal';
+    card.style.setProperty('--fill', s.fill + '%');
+    card.innerHTML =
+      '<div class="skill-top"><span class="skill-name">'+s.name+'</span><span class="skill-level">'+s.level+'</span></div>' +
+      '<p class="skill-desc">'+s.desc+'</p>';
+    grid.appendChild(card);
+  });
+  if('IntersectionObserver' in window && !reducedMotion){
+    var skillIo = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){ entry.target.classList.add('in'); skillIo.unobserve(entry.target); }
+      });
+    }, {threshold:0.15});
+    document.querySelectorAll('#skillsGrid .skill-card').forEach(function(el){ skillIo.observe(el); });
+  } else {
+    document.querySelectorAll('#skillsGrid .skill-card').forEach(function(el){ el.classList.add('in'); });
+  }
+  
+
+ 
+
+  /* ---------- Hero mouse-reactive glow ---------- */
+  var glow = document.getElementById('heroGlow');
+  var heroEl = document.querySelector('.hero');
+  if(!reducedMotion){
+    heroEl.addEventListener('mousemove', function(e){
+      var rect = heroEl.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      glow.style.transform = 'translate(' + (x*0.12 - 60) + 'px, ' + (y*0.12 - 60) + 'px)';
+    });
+  }
+
+  /* ---------- Hero canvas: curriculum path network ---------- */
+  var canvas = document.getElementById('pathCanvas');
+  var ctx = canvas.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W, H, nodes = [];
+  var mouse = {x:-9999, y:-9999};
+
+  function resize(){
+    W = canvas.parentElement.offsetWidth;
+    H = canvas.parentElement.offsetHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    initNodes();
+  }
+
+  function initNodes(){
+    nodes = [];
+    var count = Math.round((W*H) / 42000);
+    count = Math.max(14, Math.min(count, 34));
+    for(var i=0;i<count;i++){
+      nodes.push({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        vx: (Math.random()-0.5)*0.15,
+        vy: (Math.random()-0.5)*0.15,
+        r: Math.random()*1.6 + 1.2
+      });
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var maxDist = Math.min(180, W*0.16);
+
+    for(var i=0;i<nodes.length;i++){
+      var n = nodes[i];
+      if(!reducedMotion){
+        n.x += n.vx; n.y += n.vy;
+        if(n.x < 0 || n.x > W) n.vx *= -1;
+        if(n.y < 0 || n.y > H) n.vy *= -1;
+
+        var dx = mouse.x - n.x, dy = mouse.y - n.y;
+        var d2 = dx*dx + dy*dy;
+        if(d2 < 26000){
+          var f = (1 - d2/26000) * 0.5;
+          n.x -= dx*f*0.03; n.y -= dy*f*0.03;
+        }
+      }
+    }
+
+    for(var i=0;i<nodes.length;i++){
+      for(var j=i+1;j<nodes.length;j++){
+        var a = nodes[i], b = nodes[j];
+        var dx = a.x-b.x, dy = a.y-b.y;
+        var dist = Math.sqrt(dx*dx+dy*dy);
+        if(dist < maxDist){
+          var op = (1 - dist/maxDist) * 0.22;
+          ctx.strokeStyle = 'rgba(62,99,221,' + op + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+          ctx.stroke();
+        }
+      }
+    }
+    for(var i=0;i<nodes.length;i++){
+      var n = nodes[i];
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(62,99,221,0.45)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r+3, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(62,99,221,0.08)';
+      ctx.fill();
+    }
+
+    if(!reducedMotion){ requestAnimationFrame(draw); }
+  }
+
+  window.addEventListener('resize', resize);
+  heroEl.addEventListener('mousemove', function(e){
+    var rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  heroEl.addEventListener('mouseleave', function(){ mouse.x = -9999; mouse.y = -9999; });
+
+  resize();
+  draw();
+  if(reducedMotion){
+    draw();
+  }
+
+})();
+</script>
+</body>
+</html>
