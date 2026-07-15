@@ -1061,6 +1061,22 @@ footer{
 </section>
 
 <!-- ============================================================
+     CERTIFICATIONS
+     ============================================================ -->
+<section id="certifications">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Credentials</p>
+      <h2>Certifications</h2>
+      <p>Formal training backing the craft — platform, GTM, and process methodology.</p>
+    </div>
+    <div class="skills-grid" id="certGrid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
      PHOTOGRAPHY
      ============================================================ -->
 <section id="photography">
@@ -1360,6 +1376,36 @@ document.getElementById('resumeBtn2').addEventListener('click', function (e) {
     document.querySelectorAll('#skillsGrid .skill-card').forEach(function(el){ el.classList.add('in'); });
   }
   
+/* ---------- Certifications data + render ---------- */
+var certifications = [
+  {name:'PagerDuty Responder', issuer:'PagerDuty', desc:'Incident response and on-call operations fundamentals.'},
+  {name:'PagerDuty Runbook Automation', issuer:'PagerDuty', desc:'Automation workflow design and platform proficiency.'},
+  {name:'PagerDuty Foundational', issuer:'PagerDuty', desc:'Core platform architecture and use-case fluency.'},
+  {name:'Gong Launch Program Manager', issuer:'Gong', desc:'Revenue intelligence deployment and enablement design.'},
+  {name:'HubSpot Sales Enablement', issuer:'HubSpot', desc:'Enablement content strategy and sales process alignment.'},
+  {name:'Six Sigma Yellow Belt', issuer:'6sigmastudy', desc:'Process rigor and data-driven improvement methodology.'},
+];
+var certGrid = document.getElementById('certGrid');
+certifications.forEach(function(c, i){
+  var card = document.createElement('div');
+  card.className = 'skill-card reveal';
+  card.innerHTML =
+    '<div class="skill-top"><span class="skill-name">'+c.name+'</span>' +
+    (c.issuer ? '<span class="skill-level">'+c.issuer+'</span>' : '') + '</div>' +
+    '<p class="skill-desc">'+c.desc+'</p>';
+  certGrid.appendChild(card);
+});
+if('IntersectionObserver' in window && !reducedMotion){
+  var certIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){ entry.target.classList.add('in'); certIo.unobserve(entry.target); }
+    });
+  }, {threshold:0.15});
+  document.querySelectorAll('#certGrid .skill-card').forEach(function(el){ certIo.observe(el); });
+} else {
+  document.querySelectorAll('#certGrid .skill-card').forEach(function(el){ el.classList.add('in'); });
+}
+
 document.addEventListener("contextmenu", (event) => {
     event.preventDefault();
 });
