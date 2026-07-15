@@ -1331,7 +1331,7 @@ document.getElementById('resumeBtn2').addEventListener('click', function (e) {
   var skills = [
     {name:'Curriculum Architecture', desc:'Designed program structure end-to-end — sequencing, prerequisite mapping, assessment design — across 20+ course modules and 2 major certification/learning paths at PagerDuty.'},
     {name:'AI-Assisted Production Systems', desc:'Built and owned prompt-engineered workflows with Claude & GPT that cut content production from weeks to days, without sacrificing SME-reviewed accuracy.'},
-    {name:'Articulate Storyline / Rise', desc:'Scenario-based, interactive eLearning builds from storyboard to publish — the primary tool behind every shipped module.'},
+    {name:'Articulate Rise 360', desc:'Scenario-based, interactive eLearning builds from storyboard to publish — the primary tool behind every shipped module.'},
     {name:'Technical Writing', desc:'Translated platform-level complexity into documentation and course content people actually read and finish.'},
     {name:'LMS & Platform Ops', desc:'Co-administered Skilljar: publishing, enrollment, reporting, and permissions. Ran the infrastructure, not just authored into it.'},
     {name:'Multimedia Production', desc:'Premiere, Audition, and Photoshop for walkthroughs, narration, and certification media — no production team required.'},
@@ -1345,7 +1345,7 @@ document.getElementById('resumeBtn2').addEventListener('click', function (e) {
     card.className = 'skill-card reveal';
     card.style.setProperty('--fill', s.fill + '%');
     card.innerHTML =
-      '<div class="skill-top"><span class="skill-name">'+s.name+'</span><span class="skill-level">'+s.level+'</span></div>' +
+      '<div class="skill-top"><span class="skill-name">'+s.name+'</span></div>' +
       '<p class="skill-desc">'+s.desc+'</p>';
     grid.appendChild(card);
   });
