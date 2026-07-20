@@ -151,14 +151,6 @@ p{margin:0;}
   transition:transform .25s var(--ease), box-shadow .25s var(--ease);
 }
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 10px 24px -8px var(--accent-glow);}
-.nav-cta-group{display:flex;align-items:center;gap:10px;}
-.nav-cta.secondary{
-  color:var(--accent);
-  background:transparent;
-  border:1px solid var(--accent-glow);
-}
-.nav-cta.secondary:hover{background:var(--accent-soft);box-shadow:none;}
-@media (max-width:900px){.nav-cta-group{display:none;}}
 
 .burger{
   display:none;
@@ -778,10 +770,7 @@ footer{
       <li><a href="#skills">Skills</a></li>
       <li><a href="#experience">Experience</a></li>
     </ul>
-    <div class="nav-cta-group">
-      <a href="https://portfolio.guslopez.cv/battlecard" class="nav-cta secondary" target="_blank" rel="noopener">Battlecard</a>
-      <a href="#contact" class="nav-cta">Contact</a>
-    </div>
+    <a href="#contact" class="nav-cta">Contact</a>
     <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -793,7 +782,6 @@ footer{
   <a href="#work">Projects</a>
   <a href="#skills">Skills</a>
   <a href="#experience">Experience</a>
-  <a href="https://portfolio.guslopez.cv/battlecard" target="_blank" rel="noopener">Battlecard</a>
   <a href="#contact">Contact</a>
 </div>
 

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Peek Pro — Value Driver Battlecard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#3C2835;
+    --accent:#A04571;
+    --canvas:#F8F5F1;
+    --card:#FFFFFF;
+    --teal:#508991;
+    --orchid:#8E3978;
+    --crimson:#853947;
+    --steel:#374352;
+    --hairline:rgba(60,40,53,0.10);
+    --ink-dim:#6b5560;
+    --font-display:'Bricolage Grotesque',sans-serif;
+    --font-body:'DM Sans',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--canvas);}
+  body{
+    font-family:var(--font-body);
+    background:var(--canvas);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    padding:40px 20px 60px;
+    display:flex;
+    justify-content:center;
+  }
+  .page{
+    width:100%;
+    max-width:1240px;
+    padding:26px 34px 30px;
+    display:flex;flex-direction:column;
+    gap:16px;
+    background:var(--canvas);
+    border-radius:18px;
+    box-shadow:0 1px 3px rgba(60,40,53,0.06), 0 20px 48px rgba(60,40,53,0.10);
+  }
+  @media (max-width:860px){
+    body{padding:20px 12px 40px;}
+    .page{padding:20px;}
+    .header{flex-direction:column;align-items:flex-start;gap:8px;}
+    .header-right{text-align:left;}
+    .grid{grid-template-columns:1fr !important;}
+    .colhead{display:none;}
+    .coach{grid-template-columns:1fr !important;gap:16px;}
+    .golden{border-left:none;border-top:2px solid var(--accent);padding-left:0;padding-top:10px;}
+  }
+
+  /* ---------- PRINT BUTTON ---------- */
+  .print-btn{
+    position:fixed;top:22px;right:22px;
+    display:flex;align-items:center;gap:7px;
+    font-family:var(--font-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;
+    font-weight:600;color:#fff;
+    background:var(--ink);
+    border:none;border-radius:999px;
+    padding:10px 18px 10px 15px;
+    cursor:pointer;
+    box-shadow:0 2px 6px rgba(60,40,53,0.18), 0 8px 20px rgba(60,40,53,0.12);
+    transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .print-btn svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .print-btn:hover{background:var(--accent);transform:translateY(-1px);box-shadow:0 4px 10px rgba(160,69,113,0.28), 0 10px 24px rgba(60,40,53,0.14);}
+  .print-btn:active{transform:translateY(0);}
+
+  @media print{
+    .print-btn{display:none;}
+    body{padding:0;display:block;}
+    .page{max-width:none;box-shadow:none;border-radius:0;width:11in;padding:0.32in 0.4in 0.28in 0.4in;}
+    @page{size:11in 8.5in;margin:0;}
+  }
+
+  /* ---------- HEADER ---------- */
+  .header{
+    display:flex;align-items:flex-end;justify-content:space-between;
+  }
+  .header-left{display:flex;flex-direction:column;gap:3px;}
+  .brandline{
+    display:flex;align-items:center;gap:8px;
+    font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--accent);font-weight:600;
+  }
+  .brandline .dot{width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--orchid));}
+  .title{
+    font-family:var(--font-display);font-weight:800;font-size:27px;letter-spacing:-0.01em;
+    color:var(--ink);line-height:1.05;
+  }
+  .subtitle{
+    font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--ink-dim);font-weight:500;
+  }
+  .header-right{
+    text-align:right;font-family:var(--font-mono);font-size:9px;color:var(--ink-dim);
+    letter-spacing:0.04em;line-height:1.5;
+  }
+  .header-right strong{color:var(--ink);}
+
+  /* ---------- GRID ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:1.3fr 2.2fr 2fr 2.2fr 2.2fr;
+    grid-template-rows:auto repeat(4,auto);
+    gap:10px;
+  }
+  .colhead{
+    font-family:var(--font-mono);font-size:8.7px;letter-spacing:0.10em;text-transform:uppercase;
+    color:var(--ink-dim);font-weight:600;
+    display:flex;align-items:center;padding:0 4px 3px 4px;
+  }
+  .colhead.first{color:transparent;}
+
+  .cell{
+    background:var(--card);
+    border-radius:12px;
+    border:1px solid var(--hairline);
+    padding:14px 16px;
+    display:flex;flex-direction:column;
+    justify-content:center;
+    min-height:104px;
+    box-shadow:0 1px 2px rgba(60,40,53,0.04);
+  }
+  .cell h5{
+    font-family:var(--font-mono);font-size:8px;letter-spacing:0.09em;text-transform:uppercase;
+    color:var(--ink-dim);font-weight:600;margin-bottom:3px;
+  }
+  .cell p{font-size:12px;line-height:1.4;color:var(--ink);}
+  .cell ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+  .cell li{font-size:12px;line-height:1.36;color:var(--ink);padding-left:13px;position:relative;}
+  .cell li::before{
+    content:'';position:absolute;left:0;top:6.5px;width:4px;height:4px;border-radius:50%;
+    background:var(--row-color,var(--accent));
+  }
+
+  /* Value driver band */
+  .vd-band{
+    border-radius:12px;
+    display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+    gap:6px;padding:16px 15px;
+    min-height:104px;
+    color:#fff;
+    background:linear-gradient(155deg,var(--row-color),var(--row-color-2));
+    box-shadow:0 2px 6px rgba(0,0,0,0.12);
+  }
+  .vd-icon{width:19px;height:19px;}
+  .vd-icon svg{width:100%;height:100%;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .vd-label{font-family:var(--font-display);font-weight:700;font-size:12.5px;line-height:1.12;letter-spacing:-0.005em;}
+
+  /* Why-wins cell accent */
+  .win-cell{background:linear-gradient(180deg,#FFFFFF, #FBF3F6);border-color:rgba(160,69,113,0.22);}
+  .win-cell p{font-weight:500;}
+  .win-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    font-family:var(--font-mono);font-size:7.3px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:3px;
+  }
+
+  /* Row color assignment */
+  .row-revenue{--row-color:#508991;--row-color-2:#3d6c73;}
+  .row-ops{--row-color:#A04571;--row-color-2:#853947;}
+  .row-guest{--row-color:#8E3978;--row-color-2:#6d2b5d;}
+  .row-scale{--row-color:#374352;--row-color-2:#232b34;}
+
+  /* ---------- FOOTER : COACH'S CORNER ---------- */
+  .coach{
+    background:var(--ink);
+    border-radius:14px;
+    color:#F6F0F3;
+    padding:11px 20px;
+    display:grid;
+    grid-template-columns:1.55fr 1.55fr 1fr;
+    gap:22px;
+    align-items:center;
+  }
+  .coach-title{
+    display:flex;align-items:center;gap:7px;
+    font-family:var(--font-mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;
+    color:#E6B9CC;font-weight:700;margin-bottom:6px;
+  }
+  .coach-title .badge{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  .coach-list{list-style:none;display:flex;flex-direction:column;gap:3px;}
+  .coach-list li{
+    font-size:10px;line-height:1.3;color:#EFE4E9;padding-left:15px;position:relative;
+  }
+  .coach-list li::before{
+    content:'✓';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:9.5px;
+  }
+  .chain-title{
+    font-family:var(--font-mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;
+    color:#E6B9CC;font-weight:700;margin-bottom:7px;
+  }
+  .chain-flow{display:flex;align-items:center;flex-wrap:wrap;gap:3px;font-family:var(--font-mono);}
+  .chain-flow span.step{
+    font-size:9px;color:#F6F0F3;background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.14);border-radius:6px;padding:3px 7px;white-space:nowrap;
+  }
+  .chain-flow span.arrow{color:var(--accent);font-size:10px;}
+  .golden{
+    border-left:2px solid var(--accent);padding-left:14px;
+  }
+  .golden .gk{
+    font-family:var(--font-mono);font-size:8.5px;letter-spacing:0.1em;text-transform:uppercase;
+    color:#E6B9CC;font-weight:700;margin-bottom:4px;
+  }
+  .golden .gq{
+    font-family:var(--font-display);font-weight:700;font-size:14px;line-height:1.22;
+    color:#fff;font-style:italic;
+  }
+</style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">
+  <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+  Print
+</button>
+<div class="page">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="brandline"><span class="dot"></span>Peek Pro · Sales Enablement</div>
+      <div class="title">Value Driver Battlecard</div>
+      <div class="subtitle">Enterprise Discovery Battlecard &nbsp;•&nbsp; Internal Use &nbsp;•&nbsp; Keep the Conversation at the Business Level</div>
+    </div>
+    <div class="header-right">
+      Source: <strong>The Peek Pro Way</strong> — Sales Playbook, Ch. 1 &amp; 4<br>
+      For Account Executives &amp; BDRs
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="colhead first">Value Driver</div>
+    <div class="colhead">Pain</div>
+    <div class="colhead">Outcomes</div>
+    <div class="colhead">Required Capabilities</div>
+    <div class="colhead">Why Peek Pro Wins</div>
+
+    <!-- ROW 1: GROW REVENUE -->
+    <div class="vd-band row-revenue">
+      <div class="vd-icon"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
+      <div class="vd-label">Grow<br>Revenue</div>
+    </div>
+    <div class="cell"><p>Empty inventory, weekday gaps, and pricing that never flexes with demand — revenue quietly left on the table.</p></div>
+    <div class="cell row-revenue"><ul>
+      <li>More direct bookings, higher conversion</li>
+      <li>Higher AOV via on-site upsells</li>
+      <li>Higher revenue per departure / guest</li>
+    </ul></div>
+    <div class="cell"><ul>
+      <li>Online Booking Engine</li>
+      <li>Dynamic Pricing</li>
+      <li>Mobile POS</li>
+      <li>Gift Cards &amp; Memberships</li>
+    </ul></div>
+    <div class="cell win-cell"><span class="win-badge">Why we win</span><p>Turns booking and pricing data straight into revenue — visible immediately in Conversion Rate and Revenue/Departure, not a vague promise.</p></div>
+
+    <!-- ROW 2: OPERATIONAL EFFICIENCY -->
+    <div class="vd-band row-ops">
+      <div class="vd-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.55 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09A1.7 1.7 0 004.6 8.4a1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34H9a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87V9a1.7 1.7 0 001.55 1H21a2 2 0 010 4h-.09a1.7 1.7 0 00-1.55 1z"/></svg></div>
+      <div class="vd-label">Operational<br>Efficiency</div>
+    </div>
+    <div class="cell"><p>Manual scheduling, paper waivers, and phone-heavy bookings — staff re-entering the same data across disconnected systems.</p></div>
+    <div class="cell row-ops"><ul>
+      <li>Fewer double bookings</li>
+      <li>Faster check-in, lower labor cost</li>
+      <li>Less manual data entry</li>
+    </ul></div>
+    <div class="cell"><ul>
+      <li>Reservation Management</li>
+      <li>Digital Waivers</li>
+      <li>API Integrations</li>
+      <li>Automated Guest Messaging</li>
+    </ul></div>
+    <div class="cell win-cell"><span class="win-badge">Why we win</span><p>Replaces disconnected, manual workflows with one integrated system — Check-in Time and Cancellation Rate move without adding headcount.</p></div>
+
+    <!-- ROW 3: GUEST EXPERIENCE -->
+    <div class="vd-band row-guest">
+      <div class="vd-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.9L22 9.6l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.6L2 9.6l7.1-.7z" stroke-linejoin="round"/></svg></div>
+      <div class="vd-label">Guest<br>Experience</div>
+    </div>
+    <div class="cell"><p>Slow check-in, poor pre-arrival communication, and checkout abandonment — guests arrive confused or don't book at all.</p></div>
+    <div class="cell row-guest"><ul>
+      <li>Faster check-in, fewer no-shows</li>
+      <li>Higher guest satisfaction</li>
+      <li>Stronger guest lifetime value</li>
+    </ul></div>
+    <div class="cell"><ul>
+      <li>Digital Waivers</li>
+      <li>Automated Guest Messaging</li>
+      <li>Mobile POS</li>
+      <li>Online Booking Engine</li>
+    </ul></div>
+    <div class="cell win-cell"><span class="win-badge">Why we win</span><p>Redesigns every guest touchpoint — booking, waiver, check-in, communication — protecting the lifetime value each guest represents.</p></div>
+
+    <!-- ROW 4: SCALE THE BUSINESS -->
+    <div class="vd-band row-scale">
+      <div class="vd-icon"><svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg></div>
+      <div class="vd-label">Scale the<br>Business</div>
+    </div>
+    <div class="cell"><p>A new location, seasonal demand, or growing headcount — all planned on guesswork instead of reliable data.</p></div>
+    <div class="cell row-scale"><ul>
+      <li>Better forecasting, fewer surprises</li>
+      <li>Consistent operations across sites</li>
+      <li>Growth without added overhead</li>
+    </ul></div>
+    <div class="cell"><ul>
+      <li>Reporting &amp; Analytics</li>
+      <li>API Integrations</li>
+      <li>Reservation Management</li>
+    </ul></div>
+    <div class="cell win-cell"><span class="win-badge">Why we win</span><p>Turns "educated guesses" into forecasting reps can point to — expansion without the operational chaos that usually comes with it.</p></div>
+  </div>
+
+  <div class="coach">
+    <div>
+      <div class="coach-title"><span class="badge"></span>Coach's Corner — Discovery Reminders</div>
+      <ul class="coach-list">
+        <li>Start with business outcomes, not features.</li>
+        <li>Diagnose before you prescribe.</li>
+        <li>Quantify the cost of the problem.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="chain-title">Every Feature Climbs the Value Chain</div>
+      <div class="chain-flow">
+        <span class="step">Feature</span><span class="arrow">→</span>
+        <span class="step">Capability</span><span class="arrow">→</span>
+        <span class="step">Operational Impact</span><span class="arrow">→</span>
+        <span class="step">Business Outcome</span><span class="arrow">→</span>
+        <span class="step">Executive Value</span>
+      </div>
+    </div>
+    <div class="golden">
+      <div class="gk">Golden Question</div>
+      <div class="gq">"What happens if nothing changes?"</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

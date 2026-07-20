@@ -188,12 +188,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal-drift);outline
 .part-thesis{max-width:640px;font-size:17px;color:var(--ink-dim);margin-bottom:40px;}
 .part-chapters{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
 .part-chapter-chip{
+  display:flex;flex-direction:column;
   border:1px solid var(--hairline);border-radius:10px;padding:14px 16px;
   background:rgba(255,255,255,0.02);text-decoration:none;transition:all .2s;
 }
 .part-chapter-chip:hover{background:rgba(255,255,255,0.05);border-color:var(--hairline);}
-.part-chapter-chip .num{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);}
-.part-chapter-chip .name{font-family:var(--font-display);font-weight:600;font-size:14.5px;margin-top:4px;color:var(--ink);}
+.part-chapter-chip .num{display:block;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);}
+.part-chapter-chip .name{display:block;font-family:var(--font-display);font-weight:600;font-size:14.5px;margin-top:4px;color:var(--ink);}
 
 /* ===========================================================
    CHAPTER STRUCTURE
