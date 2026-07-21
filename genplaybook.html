@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Outbound Playbook — A Field Guide for Any BDR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===========================================================
+   THE OUTBOUND PLAYBOOK — DESIGN TOKENS
+   A calm, paper-toned reading theme built for long sessions.
+   Display: Fraunces | Body: Source Serif 4 | Data: IBM Plex Mono
+=========================================================== */
+:root{
+  --paper:#F2EEE3;
+  --paper-raised:#FBF9F1;
+  --paper-raised-2:#EAE2CE;
+  --paper-sunken:#E8E1CE;
+
+  --forest:#4B6455;   /* Part I accent */
+  --clay:#A6543F;     /* Part II accent */
+  --slate:#4A6B7C;    /* Part III accent */
+  --amber:#96702F;    /* Battlecard accent */
+
+  --ink:#2A2620;
+  --ink-dim:#5B5346;
+  --ink-faint:#8C8271;
+  --hairline:rgba(42,38,32,0.14);
+
+  --font-display:'Fraunces','Georgia',serif;
+  --font-body:'Source Serif 4','Georgia',serif;
+  --font-mono:'IBM Plex Mono',monospace;
+
+  --radius:10px;
+  --maxw:1180px;
+  --readw:700px;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:18px;
+  line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;}
+h1,h2,h3,h4{font-family:var(--font-display);margin:0;font-weight:600;letter-spacing:-0.01em;}
+p{margin:0 0 1em 0;color:var(--ink-dim);}
+ul,ol{margin:0;padding:0;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;}
+
+::selection{background:var(--amber);color:#fff;}
+a:focus-visible,button:focus-visible{outline:2px solid var(--slate);outline-offset:3px;}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;scroll-behavior:auto !important;}
+}
+
+/* ===========================================================
+   TOP NAV
+=========================================================== */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 24px;
+  background:rgba(242,238,227,0.90);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--hairline);
+}
+.brand-mark{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-display);font-weight:600;font-size:17px;
+  color:var(--ink);text-decoration:none;
+}
+.brand-mark .dot{width:9px;height:9px;border-radius:50%;background:var(--clay);}
+.brand-mark small{
+  display:block;font-family:var(--font-mono);font-weight:400;font-size:10px;
+  letter-spacing:0.08em;color:var(--ink-faint);text-transform:uppercase;
+}
+.nav-toggle{
+  display:none;background:none;border:1px solid var(--hairline);border-radius:8px;
+  color:var(--ink);padding:8px 10px;font-family:var(--font-mono);font-size:12px;cursor:pointer;
+}
+.topnav-links{display:flex;gap:22px;font-family:var(--font-mono);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;}
+.topnav-links a{text-decoration:none;color:var(--ink-faint);transition:color .2s;}
+.topnav-links a:hover, .topnav-links a.active{color:var(--clay);}
+
+/* ===========================================================
+   SIDE TOC (desktop)
+=========================================================== */
+.layout{display:flex;padding-top:58px;}
+.side-toc{
+  width:250px;flex-shrink:0;
+  position:sticky;top:58px;align-self:flex-start;
+  height:calc(100vh - 58px);
+  overflow-y:auto;
+  padding:32px 18px 60px 28px;
+  border-right:1px solid var(--hairline);
+}
+.side-toc::-webkit-scrollbar{width:5px;}
+.side-toc::-webkit-scrollbar-thumb{background:var(--paper-raised-2);border-radius:4px;}
+.toc-part{margin-bottom:26px;}
+.toc-part-label{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.toc-part-label .swatch{width:8px;height:8px;border-radius:2px;}
+.toc-part ul{list-style:none;display:flex;flex-direction:column;gap:2px;}
+.toc-part a{
+  display:block;text-decoration:none;color:var(--ink-dim);font-size:13px;
+  padding:5px 8px 5px 10px;border-left:2px solid transparent;border-radius:0 6px 6px 0;
+  transition:all .18s;
+}
+.toc-part a:hover{color:var(--ink);background:rgba(42,38,32,0.04);}
+.toc-part a.active{color:var(--ink);border-left-color:var(--clay);background:rgba(166,84,63,0.08);}
+.main-col{flex:1;min-width:0;}
+
+@media (max-width:980px){
+  .side-toc{position:fixed;left:0;top:58px;bottom:0;background:var(--paper);z-index:90;
+    transform:translateX(-100%);transition:transform .25s ease;width:78vw;max-width:320px;box-shadow:20px 0 40px rgba(0,0,0,0.15);}
+  .side-toc.open{transform:translateX(0);}
+  .nav-toggle{display:block;}
+  .topnav-links{display:none;}
+}
+
+/* ===========================================================
+   HERO
+=========================================================== */
+.hero{
+  position:relative;min-height:60vh;display:flex;flex-direction:column;justify-content:center;
+  padding:120px 28px 70px;border-bottom:1px solid var(--hairline);
+}
+.hero-content{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;width:100%;}
+.eyebrow{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--clay);display:flex;align-items:center;gap:10px;margin-bottom:22px;
+}
+.eyebrow::before{content:'';width:26px;height:1px;background:var(--clay);}
+.hero-title{
+  font-size:clamp(38px,6.4vw,78px);line-height:1.02;margin-bottom:26px;
+}
+.hero-title .light{font-weight:300;color:var(--ink-dim);}
+.hero-title .bold{font-weight:700;color:var(--ink);}
+.hero-sub{font-size:19px;max-width:620px;color:var(--ink-dim);margin-bottom:38px;font-family:var(--font-body);}
+.hero-meta{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.06em;}
+.hero-meta b{color:var(--ink);font-weight:600;}
+
+/* ===========================================================
+   BATTLECARD (BLUF)
+=========================================================== */
+.battlecard{padding:70px 28px 90px;background:var(--paper-sunken);border-bottom:1px solid var(--hairline);}
+.battlecard-inner{max-width:var(--maxw);margin:0 auto;}
+.bluf-tag{
+  display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;
+  letter-spacing:0.1em;text-transform:uppercase;color:#fff;background:var(--amber);
+  padding:6px 12px;border-radius:20px;margin-bottom:20px;
+}
+.battlecard h2.part-title{color:var(--ink);margin-bottom:14px;}
+.battlecard .part-thesis{max-width:720px;color:var(--ink-dim);font-size:17px;margin-bottom:36px;}
+
+/* ===========================================================
+   PART DIVIDER
+=========================================================== */
+.part-divider{
+  position:relative;overflow:hidden;padding:90px 28px;margin-top:0;
+  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
+  background:var(--paper-raised);
+}
+.part-inner{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;}
+.part-roman{font-family:var(--font-mono);font-size:13px;letter-spacing:0.16em;color:var(--ink-faint);margin-bottom:18px;text-transform:uppercase;}
+.part-title{font-size:clamp(30px,5vw,50px);margin-bottom:20px;}
+.part-thesis{max-width:640px;font-size:17px;color:var(--ink-dim);margin-bottom:40px;}
+.part-chapters{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
+.part-chapter-chip{
+  display:flex;flex-direction:column;
+  border:1px solid var(--hairline);border-radius:10px;padding:14px 16px;
+  background:var(--paper);text-decoration:none;transition:all .2s;
+}
+.part-chapter-chip:hover{background:var(--paper-raised-2);}
+.part-chapter-chip .num{display:block;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);}
+.part-chapter-chip .name{display:block;font-family:var(--font-display);font-weight:600;font-size:14.5px;margin-top:4px;color:var(--ink);}
+
+/* ===========================================================
+   CHAPTER STRUCTURE
+=========================================================== */
+.chapter{padding:90px 28px 20px;scroll-margin-top:70px;}
+.chapter-head{max-width:var(--readw);margin-bottom:44px;}
+.ch-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.ch-eyebrow::before{content:'';width:22px;height:1px;}
+.chapter-title{font-size:clamp(26px,3.6vw,40px);margin-bottom:0;}
+.chapter-title .w300{font-weight:300;color:var(--ink-dim);}
+.chapter-title .w700{font-weight:700;}
+
+.principle-card{
+  max-width:var(--readw);border-radius:var(--radius);padding:28px 32px;margin-bottom:46px;
+  background:var(--paper-raised);border-left:3px solid var(--forest);position:relative;
+}
+.principle-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-faint);margin-bottom:12px;}
+.principle-text{font-family:var(--font-display);font-weight:500;font-size:21px;line-height:1.45;color:var(--ink);}
+.principle-text em{font-style:normal;font-weight:700;color:var(--clay);}
+
+.section-block{max-width:var(--readw);margin-bottom:52px;}
+.section-block.wide{max-width:none;}
+.block-h{font-family:var(--font-display);font-weight:600;font-size:22px;margin-bottom:16px;color:var(--ink);}
+.block-h small{display:block;font-family:var(--font-mono);font-weight:400;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;}
+.lede{font-size:17px;color:var(--ink-dim);}
+.lede strong{color:var(--ink);font-weight:600;}
+
+.callout{
+  border-radius:12px;padding:22px 24px;margin:20px 0;
+  background:rgba(74,107,124,0.09);border:1px solid rgba(74,107,124,0.25);
+}
+.callout.warn{background:rgba(166,84,63,0.09);border-color:rgba(166,84,63,0.28);}
+.callout p{margin:0;color:var(--ink-dim);}
+.callout .tag{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:var(--slate);margin-bottom:8px;display:block;}
+.callout.warn .tag{color:var(--clay);}
+
+/* checklists */
+.checklist{list-style:none;display:flex;flex-direction:column;gap:10px;margin:18px 0;}
+.checklist li{display:flex;gap:12px;align-items:flex-start;color:var(--ink-dim);font-size:16px;}
+.checklist li::before{content:'';flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--slate);margin-top:9px;}
+
+/* quote / dialogue */
+.dialogue{border-radius:12px;overflow:hidden;margin:18px 0;border:1px solid var(--hairline);background:var(--paper-raised);}
+.dialogue .line{padding:14px 18px;font-size:15px;border-bottom:1px solid var(--hairline);}
+.dialogue .line:last-child{border-bottom:none;}
+.dialogue .who{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-faint);margin-bottom:4px;}
+.dialogue .customer{background:rgba(42,38,32,0.025);}
+.dialogue .customer .who{color:var(--clay);}
+.dialogue .rep .who{color:var(--slate);}
+.dialogue p{margin:0;color:var(--ink);}
+
+/* ===== data tables ===== */
+.table-wrap{max-width:none;overflow-x:auto;margin:20px 0;border-radius:12px;border:1px solid var(--hairline);background:var(--paper-raised);}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px;}
+thead th{
+  font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;
+  color:var(--ink-faint);text-align:left;padding:13px 18px;background:var(--paper-raised-2);border-bottom:1px solid var(--hairline);
+}
+tbody td{padding:13px 18px;border-bottom:1px solid var(--hairline);color:var(--ink-dim);vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(42,38,32,0.02);}
+td.hl{color:var(--ink);font-weight:600;}
+td.mono{font-family:var(--font-mono);font-size:12.5px;}
+
+/* ===== card grids ===== */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:20px 0;max-width:none;}
+.card-grid.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));}
+.card{
+  border:1px solid var(--hairline);border-radius:12px;padding:22px 22px;background:var(--paper-raised);
+  transition:border-color .2s;
+}
+.card:hover{border-color:rgba(42,38,32,0.3);}
+.card h4{font-family:var(--font-display);font-weight:600;font-size:16px;margin-bottom:10px;color:var(--ink);}
+.card .k{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;display:block;margin:12px 0 4px;}
+.card p{font-size:14.5px;margin-bottom:0;}
+.card p+ .k{margin-top:14px;}
+
+/* persona cards */
+.persona-card{border-top:3px solid var(--clay);}
+.persona-card .k.wants{color:var(--slate);}
+.persona-card .k.metrics{color:var(--clay);}
+.persona-card .k.q{color:var(--ink-faint);}
+.persona-q{font-style:normal;font-family:var(--font-display);font-size:14.5px;color:var(--ink);}
+
+/* capability cards */
+.cap-card{border-top:3px solid var(--slate);}
+.cap-card .k{color:var(--slate);}
+
+/* ===== flow / value chain (signature motif) ===== */
+.chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:26px 0;max-width:none;}
+.chain-step{
+  flex:1 1 150px;min-width:130px;position:relative;padding:20px 18px 20px 22px;border-radius:10px;
+  background:var(--paper-raised);margin-right:26px;border:1px solid var(--hairline);
+}
+.chain-step:last-child{margin-right:0;}
+.chain-step::after{
+  content:'→';position:absolute;right:-24px;top:50%;transform:translateY(-50%);
+  font-family:var(--font-mono);color:var(--ink-faint);font-size:15px;
+}
+.chain-step:last-child::after{content:none;}
+.chain-step .n{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);display:block;margin-bottom:6px;}
+.chain-step .t{font-family:var(--font-display);font-weight:600;font-size:14.5px;color:var(--ink);line-height:1.3;}
+.chain-step.peak{background:linear-gradient(135deg,rgba(166,84,63,0.14),rgba(74,107,124,0.14));border:1px solid rgba(42,38,32,0.18);}
+@media (max-width:700px){
+  .chain-step{margin-right:0;margin-bottom:24px;flex:1 1 100%;}
+  .chain-step::after{content:'↓';right:auto;left:18px;top:auto;bottom:-22px;transform:none;}
+  .chain-step:last-child{margin-bottom:0;}
+}
+
+/* stage flow (discovery framework) */
+.stage-flow{display:flex;flex-direction:column;gap:0;margin:22px 0;max-width:none;}
+.stage{
+  display:grid;grid-template-columns:56px 1fr;gap:18px;padding:20px 0;border-bottom:1px solid var(--hairline);
+}
+.stage:last-child{border-bottom:none;}
+.stage .idx{
+  width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:600;font-size:15px;background:var(--paper-raised-2);color:var(--slate);
+  border:1px solid var(--hairline);
+}
+.stage h4{font-family:var(--font-display);font-weight:600;font-size:16.5px;margin-bottom:6px;color:var(--ink);}
+.stage p{font-size:14.5px;margin-bottom:0;}
+.stage .qs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.qtag{font-size:12.5px;padding:5px 11px;border-radius:20px;background:var(--paper-raised);border:1px solid var(--hairline);color:var(--ink-dim);}
+
+/* five layers vertical bar */
+.layers{display:flex;flex-direction:column;gap:8px;margin:24px 0;max-width:none;}
+.layer{
+  border-radius:10px;padding:16px 20px;display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center;
+  border:1px solid var(--hairline);
+}
+.layer .lt{font-family:var(--font-display);font-weight:600;font-size:15px;}
+.layer .ld{font-size:13.5px;color:var(--ink-dim);margin:0;}
+.layer1{background:rgba(140,130,113,0.14);}
+.layer2{background:rgba(74,107,124,0.10);}
+.layer3{background:rgba(166,84,63,0.10);}
+.layer4{background:rgba(166,84,63,0.16);}
+.layer5{background:linear-gradient(90deg,rgba(150,112,47,0.22),rgba(74,107,124,0.16));border-color:rgba(42,38,32,0.2);}
+
+/* buckets grid (revenue/ops/cx/growth) */
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0;max-width:none;}
+.bucket{border-radius:10px;padding:16px;text-align:left;border:1px solid var(--hairline);background:var(--paper-raised);}
+.bucket .label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:block;}
+.bucket p{font-size:12.5px;margin:0;color:var(--ink-faint);}
+.bucket.revenue{border-top:3px solid var(--slate);}
+.bucket.ops{border-top:3px solid var(--ink-faint);}
+.bucket.guest{border-top:3px solid var(--clay);}
+.bucket.growth{border-top:3px solid var(--forest);}
+
+/* canvas mini grid (discovery canvas) */
+.canvas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:22px 0;max-width:none;}
+.canvas-cell{border:1px solid var(--hairline);border-radius:10px;padding:16px;background:var(--paper-raised);}
+.canvas-cell .num{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);}
+.canvas-cell h5{font-family:var(--font-display);font-size:13.5px;font-weight:600;margin:4px 0 8px;color:var(--ink);}
+.canvas-cell ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.canvas-cell li{font-size:12px;color:var(--ink-faint);padding-left:12px;position:relative;}
+.canvas-cell li::before{content:'–';position:absolute;left:0;color:var(--ink-faint);}
+
+/* tier pyramid list */
+.tiers{display:flex;flex-direction:column;gap:10px;margin:22px 0;max-width:none;}
+.tier{border-radius:10px;padding:18px 22px;border:1px solid var(--hairline);background:var(--paper-raised);}
+.tier .th{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.tier .th .badge{font-family:var(--font-mono);font-size:11px;padding:3px 9px;border-radius:5px;color:#fff;}
+.tier .th h4{font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--ink);}
+.tier p{font-size:13.5px;margin:0;}
+.tier1 .badge{background:var(--clay);}
+.tier2 .badge{background:var(--slate);}
+.tier3 .badge{background:var(--ink-faint);}
+
+/* cadence timeline */
+.cadence{display:flex;overflow-x:auto;gap:10px;margin:22px 0;padding-bottom:8px;max-width:none;}
+.cad-step{flex:0 0 150px;border:1px solid var(--hairline);border-radius:10px;padding:14px;background:var(--paper-raised);}
+.cad-step .day{font-family:var(--font-mono);font-size:11px;color:var(--slate);margin-bottom:6px;display:block;}
+.cad-step p{font-size:12.5px;margin:0;color:var(--ink-dim);}
+
+/* pillars row */
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0;max-width:none;}
+.pillar{border:1px solid var(--hairline);border-radius:10px;padding:18px 16px;text-align:center;background:var(--paper-raised);}
+.pillar .num{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-bottom:8px;}
+.pillar h5{font-family:var(--font-display);font-weight:600;font-size:14.5px;margin-bottom:6px;color:var(--ink);}
+.pillar p{font-size:12px;margin:0;color:var(--ink-faint);}
+
+/* email card */
+.email-card{max-width:600px;border-radius:12px;border:1px solid var(--hairline);overflow:hidden;margin:20px 0;background:var(--paper-raised);}
+.email-head{padding:14px 20px;border-bottom:1px solid var(--hairline);background:var(--paper-raised-2);}
+.email-head .subj{font-family:var(--font-mono);font-size:12.5px;color:var(--slate);}
+.email-body{padding:20px;font-size:15px;color:var(--ink-dim);}
+.email-body p{margin-bottom:12px;}
+
+/* stat pull */
+.pullquote{
+  font-family:var(--font-display);font-weight:500;font-size:24px;line-height:1.45;color:var(--ink);
+  max-width:660px;margin:34px 0;padding-left:22px;border-left:2px solid var(--clay);
+}
+
+/* prioritization bars */
+.pbars{display:flex;flex-direction:column;gap:14px;margin:22px 0;max-width:560px;}
+.pbar-row{display:grid;grid-template-columns:150px 1fr 44px;align-items:center;gap:12px;}
+.pbar-row .lab{font-size:13px;color:var(--ink-dim);}
+.pbar-track{height:8px;border-radius:6px;background:var(--paper-raised-2);overflow:hidden;}
+.pbar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--forest),var(--slate));}
+.pbar-row .val{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);text-align:right;}
+
+/* chapter summary footer */
+.ch-summary{
+  max-width:var(--readw);margin:60px 0 0;padding:28px 30px;border-radius:12px;background:var(--paper-raised);
+  border:1px solid var(--hairline);
+}
+.ch-summary .tag{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-faint);margin-bottom:10px;display:block;}
+.ch-summary p{color:var(--ink-dim);margin-bottom:10px;}
+.ch-summary p:last-child{margin-bottom:0;}
+.ch-summary strong{color:var(--ink);}
+.ch-end{height:1px;max-width:var(--readw);background:var(--hairline);margin:56px 0 0;}
+
+footer{border-top:1px solid var(--hairline);padding:50px 28px 60px;max-width:var(--maxw);margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:flex-end;}
+.colophon{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);line-height:1.8;text-align:right;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="#hero" class="brand-mark">
+    <span class="dot"></span>
+    <span>The Outbound Playbook<br><small>Objection Battlecard + Field Guide</small></span>
+  </a>
+  <nav class="topnav-links">
+    <a href="#battlecard">Battlecard</a>
+    <a href="#part1">The Sales Philosophy</a>
+    <a href="#part2">Discovery</a>
+    <a href="#part3">Business Development</a>
+  </nav>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle table of contents">☰ Contents</button>
+</header>
+
+<div class="layout">
+  <!-- ============ SIDE TOC ============ -->
+  <aside class="side-toc" id="sideToc">
+    <div class="toc-part">
+      <div class="toc-part-label"><span class="swatch" style="background:var(--amber)"></span>Read First</div>
+      <ul>
+        <li><a href="#battlecard" data-toc>Objection Battlecard</a></li>
+      </ul>
+    </div>
+    <div class="toc-part">
+      <div class="toc-part-label"><span class="swatch" style="background:var(--forest)"></span>Part I — The Sales Philosophy</div>
+      <ul>
+        <li><a href="#ch1" data-toc>Ch 1 — How Buyers Actually Buy</a></li>
+        <li><a href="#ch2" data-toc>Ch 2 — The Economic Buyer</a></li>
+        <li><a href="#ch3" data-toc>Ch 3 — The Economics of Any Business</a></li>
+        <li><a href="#ch4" data-toc>Ch 4 — The Value Architecture</a></li>
+      </ul>
+    </div>
+    <div class="toc-part">
+      <div class="toc-part-label"><span class="swatch" style="background:var(--clay)"></span>Part II — Discovery Masterclass</div>
+      <ul>
+        <li><a href="#ch5" data-toc>Ch 5 — Discovery Is Diagnosis</a></li>
+        <li><a href="#ch6" data-toc>Ch 6 — Asking Great Questions</a></li>
+        <li><a href="#ch7" data-toc>Ch 7 — Listening Like a Consultant</a></li>
+        <li><a href="#ch8" data-toc>Ch 8 — The Discovery Canvas</a></li>
+      </ul>
+    </div>
+    <div class="toc-part">
+      <div class="toc-part-label"><span class="swatch" style="background:var(--slate)"></span>Part III — Business Development</div>
+      <ul>
+        <li><a href="#ch9" data-toc>Ch 9 — BDR Mindset & Prospecting</a></li>
+        <li><a href="#ch10" data-toc>Ch 10 — Territory Planning</a></li>
+        <li><a href="#ch11" data-toc>Ch 11 — Writing Cold Outreach</a></li>
+        <li><a href="#ch12" data-toc>Ch 12 — Cold Calling</a></li>
+        <li><a href="#ch13" data-toc>Ch 13 — Qualification</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <div class="main-col">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <div class="eyebrow">Sales Enablement · Any Product, Any Industry · 13 Chapters</div>
+      <h1 class="hero-title"><span class="light">The Outbound</span><br><span class="bold">Playbook</span></h1>
+      <p class="hero-sub">A field guide for any BDR or inside sales rep, in any company, selling any product: how buyers actually think, what they actually want, and how to turn discovery into a business case the customer helps you build. Starts with a battlecard you can use today.</p>
+      <div class="hero-meta">
+        <span><b>Read First</b> — Objection Battlecard</span>
+        <span><b>Part I</b> — The Sales Philosophy</span>
+        <span><b>Part II</b> — Discovery Masterclass</span>
+        <span><b>Part III</b> — Business Development</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       BLUF — OBJECTION HANDLING BATTLECARD
+  ============================================================ -->
+  <section class="battlecard" id="battlecard">
+    <div class="battlecard-inner">
+      <span class="bluf-tag">BLUF · Read this before your next call</span>
+      <h2 class="part-title">The Objection Battlecard</h2>
+      <p class="part-thesis">Bottom line up front: an objection is rarely the real reason for hesitation — it's the easiest thing to say. Your job is not to argue it away. It's to stay curious long enough for the real reason to surface. Use this page as a quick-reference before or during calls; the rest of the book explains why it works.</p>
+
+      <div class="section-block wide">
+        <div class="block-h">The core rule</div>
+        <div class="callout">
+          <span class="tag">Before you respond to any objection</span>
+          <p>Don't argue, don't oversell, and don't panic-pitch. Acknowledge it in one sentence, then ask a real question. Silence and curiosity close more doors back open than a clever rebuttal ever does.</p>
+        </div>
+      </div>
+
+      <div class="section-block wide">
+        <div class="block-h">Quick-reference: 12 objections you'll hear this week</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>They say</th><th>What it usually means</th><th>What you say</th></tr></thead>
+            <tbody>
+              <tr><td class="hl">"We're not interested."</td><td>Not yet convinced this is worth five more minutes.</td><td>"Totally fair — most people aren't, before they know why I called. Can I ask one question before you go?"</td></tr>
+              <tr><td class="hl">"Just send me some information."</td><td>Easiest way to end the call politely.</td><td>"Happy to. So I don't send you generic material — what prompted you to take my call today?"</td></tr>
+              <tr><td class="hl">"We're happy with our current vendor."</td><td>Switching feels risky, not that nothing could improve.</td><td>"Good to hear. What's the one thing you'd change about it if you could?"</td></tr>
+              <tr><td class="hl">"We don't have budget right now."</td><td>Hasn't seen a cost of doing nothing large enough to justify it.</td><td>"Understood. If budget weren't a factor, is this something you'd want to fix?"</td></tr>
+              <tr><td class="hl">"Call me back next quarter."</td><td>Genuine timing issue, or a soft no.</td><td>"Sure — what changes between now and then that makes it a better time?"</td></tr>
+              <tr><td class="hl">"We tried something like this before and it didn't work."</td><td>Burned once; skeptical of repeating it.</td><td>"That's useful context — what happened last time, so I know what to avoid this time?"</td></tr>
+              <tr><td class="hl">"I'm not the right person."</td><td>True, or a way to pass you off.</td><td>"Appreciate you saying so — who else is usually involved in a decision like this, and would you mind a quick introduction?"</td></tr>
+              <tr><td class="hl">"How is this different from [competitor]?"</td><td>Actively comparing — a buying signal.</td><td>"Good question. What have you seen from them that matters most to you?" — then answer against their stated priority, not a feature list.</td></tr>
+              <tr><td class="hl">"This sounds expensive."</td><td>Hasn't connected cost to a business outcome yet.</td><td>"Compared to what it's costing you today to keep doing this manually?"</td></tr>
+              <tr><td class="hl">"I need to loop in my team."</td><td>Genuine process, or stalling.</td><td>"Makes sense — what would need to be true for your team to say yes?"</td></tr>
+              <tr><td class="hl">"We're too busy right now."</td><td>Priority problem, not a permanent no.</td><td>"I hear that a lot. Before I let you go — what's eating the most time for your team right now?"</td></tr>
+              <tr><td class="hl">"Can you just email me pricing?"</td><td>Wants to compare on price alone, out of context.</td><td>"I can — pricing depends on a couple of things. Mind if I ask two quick questions first so the number actually means something?"</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section-block wide">
+        <div class="block-h">Recognize the pattern, not just the line</div>
+        <div class="card-grid two">
+          <div class="card" style="border-top:3px solid var(--forest);">
+            <h4>Buying signals disguised as objections</h4>
+            <p>"How is this different from X?" "What would implementation actually look like?" "Who else uses this?" These are comparison-shopping, not rejection. Answer them directly and keep going.</p>
+          </div>
+          <div class="card" style="border-top:3px solid var(--clay);">
+            <h4>Genuine risk signals</h4>
+            <p>"We've been burned before." "Switching sounds painful." "My team won't like this." Don't argue these away — explore them. The fear is usually about change, not about your product.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="tag">The one thing to never do</span>
+        <p>Never respond to an objection with a longer pitch. The instinct is to add more information; the better move is to ask a shorter question. Chapters 5–8 explain why the customer talking more, not you, is what actually moves a deal.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PART I DIVIDER
+  ============================================================ -->
+  <section class="part-divider" id="part1">
+    <div class="part-inner">
+      <div class="part-roman">Part I</div>
+      <h2 class="part-title">The Sales Philosophy</h2>
+      <p class="part-thesis">The thinking underneath every conversation, in any industry: customers buy outcomes, not products — and it's the seller's job to keep translating one into the other.</p>
+      <div class="part-chapters">
+        <a class="part-chapter-chip" href="#ch1"><span class="num">Chapter 1</span><span class="name">How Buyers Actually Buy</span></a>
+        <a class="part-chapter-chip" href="#ch2"><span class="num">Chapter 2</span><span class="name">The Economic Buyer</span></a>
+        <a class="part-chapter-chip" href="#ch3"><span class="num">Chapter 3</span><span class="name">The Economics of Any Business</span></a>
+        <a class="part-chapter-chip" href="#ch4"><span class="num">Chapter 4</span><span class="name">The Value Architecture</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER 1
+  ============================================================ -->
+  <section class="chapter" id="ch1">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--forest);"><span style="background:var(--forest)"></span>Chapter 01 · Part I</div>
+      <h2 class="chapter-title"><span class="w300">How Buyers</span> <span class="w700">Actually Buy</span></h2>
+    </div>
+
+    <div class="principle-card">
+      <div class="principle-label">Principle №1</div>
+      <div class="principle-text">Customers do not buy your product. They buy <em>confidence that tomorrow's operation will run better than today's.</em></div>
+    </div>
+
+    <div class="section-block">
+      <p class="lede">Every call, email, discovery question, and follow-up should reinforce one idea: <strong>you exist to improve their business, not to replace a tool.</strong> When reps lose deals, it's rarely because a competitor had one more feature — it's because the buyer was never convinced that changing anything would produce a real outcome.</p>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">The real job to be done</div>
+      <p class="lede">A buyer rarely starts a conversation because they enjoy evaluating vendors. Something has stopped scaling.</p>
+      <ul class="checklist">
+        <li>Revenue or pipeline has plateaued</li>
+        <li>A process has become increasingly manual</li>
+        <li>Staff spend too much time on repetitive work</li>
+        <li>Customers complain about a slow or clunky experience</li>
+        <li>Managers lack visibility into what's actually happening</li>
+      </ul>
+      <p class="lede" style="margin-top:14px;">Your product is one possible solution. The underlying problem is almost always operational or financial — <strong>diagnose the business problem before you prescribe your platform.</strong></p>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">What buyers actually say vs. what they mean</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Customer says</th><th>They're really saying</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">"We need a better website / signup flow."</td><td>We're losing customers before they convert.</td></tr>
+            <tr><td class="hl">"We need better reporting."</td><td>We don't understand what's happening in our own business.</td></tr>
+            <tr><td class="hl">"We need to automate this."</td><td>Payroll is growing faster than revenue.</td></tr>
+            <tr><td class="hl">"We need integrations."</td><td>Our staff wastes time moving information manually.</td></tr>
+            <tr><td class="hl">"We need better pricing / packaging."</td><td>We believe we're leaving revenue on the table.</td></tr>
+            <tr><td class="hl">"We need a new tool."</td><td>Our current tool has become the bottleneck.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lede" style="max-width:760px;">Never stop at the requirement — ask why the requirement exists.</p>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The four business outcomes</div>
+      <p class="lede" style="max-width:760px;">Whatever you sell, every sales conversation should ultimately connect to one of four measurable outcomes.</p>
+      <div class="card-grid">
+        <div class="card" style="border-top:3px solid var(--slate);">
+          <h4>1 · Grow Revenue</h4>
+          <p>How do we sell more? Increase conversion? Reach underused capacity or channels? Increase deal size? — Rarely about the software itself. Always about growth.</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--clay);">
+          <h4>2 · Save Time & Cost</h4>
+          <p>Why is staff time going into repetitive manual work? Why does onboarding take so long? Time savings create operating leverage — leverage creates profitability.</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--forest);">
+          <h4>3 · Better Customer Experience</h4>
+          <p>Why do customers abandon signup, leave poor reviews, or arrive confused? Every customer interaction affects lifetime value.</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--ink-faint);">
+          <h4>4 · Scale Without Chaos</h4>
+          <p>How do we open a new market, manage seasonal growth, forecast demand? Technology should reduce complexity, not add to it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The sales conversation pyramid</div>
+      <p class="lede" style="max-width:760px;">Stay at the top whenever possible. Executives buy outcomes. Users buy features.</p>
+      <div class="chain">
+        <div class="chain-step"><span class="n">Level 1</span><span class="t">Features<br><span style="font-weight:400;color:var(--ink-faint);font-size:12.5px;">"Automated reminders"</span></span></div>
+        <div class="chain-step"><span class="n">Level 2</span><span class="t">Capabilities<br><span style="font-weight:400;color:var(--ink-faint);font-size:12.5px;">Customers get notified automatically</span></span></div>
+        <div class="chain-step"><span class="n">Level 3</span><span class="t">Operational Impact<br><span style="font-weight:400;color:var(--ink-faint);font-size:12.5px;">Less time spent chasing people manually</span></span></div>
+        <div class="chain-step"><span class="n">Level 4</span><span class="t">Business Outcome<br><span style="font-weight:400;color:var(--ink-faint);font-size:12.5px;">Fewer no-shows / drop-offs</span></span></div>
+        <div class="chain-step peak"><span class="n">Level 5</span><span class="t">Executive Value<br><span style="font-weight:400;color:var(--ink-dim);font-size:12.5px;">Serves more customers, same headcount</span></span></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">The buyer's silent internal checklist</div>
+      <ul class="checklist">
+        <li><strong style="color:var(--ink)">Is this worth changing for?</strong> — If not, the deal stalls.</li>
+        <li><strong style="color:var(--ink)">Can these people be trusted?</strong> — Trust outweighs features.</li>
+        <li><strong style="color:var(--ink)">Will implementation be painful?</strong> — Perceived migration risk kills more deals than product gaps.</li>
+        <li><strong style="color:var(--ink)">Will the business actually improve?</strong> — If it isn't obvious, the incumbent usually wins.</li>
+      </ul>
+    </div>
+
+    <div class="pullquote">The goal is never to convince someone to buy software. It's to help them recognize that staying where they are is more expensive than changing.</div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Before discussing any feature, ask: which business outcome does this support? How will the customer measure success? What executive priority does this solve?</p>
+      <p><strong>Can you explain the business impact without mentioning your product?</strong> If not, keep learning about the customer's business before demonstrating anything.</p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 2
+  ============================================================ -->
+  <section class="chapter" id="ch2">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--clay);"><span style="background:var(--clay)"></span>Chapter 02 · Part I</div>
+      <h2 class="chapter-title"><span class="w300">Understanding the</span> <span class="w700">Economic Buyer</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--clay);">
+      <div class="principle-label">Principle №2</div>
+      <div class="principle-text">The same product is purchased for different reasons by different people. Your job isn't one pitch — it's <em>aligning multiple stakeholders around a common outcome.</em></div>
+    </div>
+
+    <div class="section-block">
+      <p class="lede">A successful sale rarely involves a single decision-maker. While one person signs, several people influence the decision based on their own priorities, risks, and measures of success. The best reps adjust the conversation to match each stakeholder's perspective — without changing the underlying business case.</p>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The buying committee</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Role</th><th>Primary focus</th><th>Main question</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">CEO / Owner</td><td>Growth and profitability</td><td>"Will this increase the value of my business?"</td></tr>
+            <tr><td class="hl">COO / Ops Leader</td><td>Operational performance</td><td>"Will this make my team more effective?"</td></tr>
+            <tr><td class="hl">Team Manager</td><td>Daily execution</td><td>"Will this simplify my day?"</td></tr>
+            <tr><td class="hl">Marketing Leader</td><td>Customer acquisition</td><td>"Will this generate more pipeline?"</td></tr>
+            <tr><td class="hl">Sales / Revenue Leader</td><td>Pipeline and conversion</td><td>"Will this help us close more, faster?"</td></tr>
+            <tr><td class="hl">Finance / CFO</td><td>Cost and ROI</td><td>"Will this pay for itself?"</td></tr>
+            <tr><td class="hl">IT (Enterprise)</td><td>Risk and integrations</td><td>"Will this work with our systems, securely?"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Persona briefs</div>
+      <div class="card-grid two">
+        <div class="card persona-card">
+          <h4>CEO / Owner</h4>
+          <span class="k wants">Cares about</span><p>Revenue growth, profit margins, efficiency, business valuation, competitive differentiation.</p>
+          <span class="k metrics">Watches</span><p>Gross revenue, net profit, growth rate, customer lifetime value, EBITDA.</p>
+          <span class="k q">What resonates</span><p class="persona-q">"How long before we see ROI? How disruptive will implementation be?" — Focus on measurable financial outcomes; avoid interface details.</p>
+        </div>
+        <div class="card persona-card">
+          <h4>COO / Ops Leader</h4>
+          <span class="k wants">Cares about</span><p>Keeping daily operations running efficiently — staffing, execution, financial performance.</p>
+          <span class="k metrics">Watches</span><p>Team productivity, on-time delivery, error rates, complaints.</p>
+          <span class="k q">What resonates</span><p class="persona-q">Reduced manual work, operational consistency, faster execution, better visibility.</p>
+        </div>
+        <div class="card persona-card">
+          <h4>Team Manager</h4>
+          <span class="k wants">Cares about</span><p>Lives inside the daily workflow — experiences every inefficiency personally.</p>
+          <span class="k metrics">Daily frustrations</span><p>Constant manual follow-up, disconnected tools, last-minute changes, spreadsheets.</p>
+          <span class="k q">Messaging</span><p class="persona-q">Speak in operational terms. Show how your product removes repetitive work — save strategic language for executives.</p>
+        </div>
+        <div class="card persona-card">
+          <h4>Marketing Leader</h4>
+          <span class="k wants">Cares about</span><p>Attracting and converting customers, reducing cost per acquisition, measuring ROI.</p>
+          <span class="k metrics">Watches</span><p>Conversion rate, pipeline generated, CPA, repeat customers, campaign attribution.</p>
+          <span class="k q">Messaging</span><p class="persona-q">Better conversion, campaign attribution, lead quality, marketplace or channel exposure.</p>
+        </div>
+        <div class="card persona-card">
+          <h4>Sales / Revenue Leader</h4>
+          <span class="k wants">Cares about</span><p>Maximizing revenue from a finite pipeline and team — forecasting, quota attainment.</p>
+          <span class="k metrics">Watches</span><p>Win rate, cycle length, pipeline coverage, quota attainment, forecast accuracy.</p>
+          <span class="k q">Messaging</span><p class="persona-q">Faster cycles, better forecasting, less time lost to manual admin.</p>
+        </div>
+        <div class="card persona-card">
+          <h4>Finance / CFO</h4>
+          <span class="k wants">Cares about</span><p>Rarely falls in love with software — approves investments.</p>
+          <span class="k metrics">Asks</span><p>What's the ROI? Implementation cost? Payback period? Can headcount costs be reduced?</p>
+          <span class="k q">Messaging</span><p class="persona-q">Always quantify value whenever possible.</p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="tag">IT / Enterprise stakeholders</span>
+        <p>Security, integrations, data protection, APIs, downtime, access management. Never speculate — involve a Sales Engineer. Trust is more valuable than improvisation.</p>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Stakeholder map</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Stakeholder</th><th>Wants</th><th>Fears</th><th>Your message</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">CEO / Owner</td><td>Growth</td><td>Poor ROI</td><td>Increase revenue and profitability.</td></tr>
+            <tr><td class="hl">COO / Ops Leader</td><td>Efficiency</td><td>Operational disruption</td><td>Simplify daily operations.</td></tr>
+            <tr><td class="hl">Team Manager</td><td>Simplicity</td><td>More work</td><td>Reduce manual effort.</td></tr>
+            <tr><td class="hl">Marketing</td><td>Conversion</td><td>Weak campaign performance</td><td>Generate more qualified pipeline.</td></tr>
+            <tr><td class="hl">Sales Leader</td><td>Predictability</td><td>Missed quota</td><td>Faster, more reliable pipeline.</td></tr>
+            <tr><td class="hl">Finance</td><td>ROI</td><td>Overspending</td><td>Faster payback, measurable value.</td></tr>
+            <tr><td class="hl">IT</td><td>Stability</td><td>Integration risk</td><td>Secure, scalable, reliable platform.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Multi-threading</div>
+      <p class="lede">Single-threaded opportunities are vulnerable — if your primary contact leaves or loses influence, the deal often disappears with them. Healthy opportunities include conversations with an executive sponsor, an operational champion, a day-to-day user, a technical reviewer, and a financial stakeholder.</p>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Before every meeting, identify: who you're speaking with, what outcomes matter most to them, what metrics define success, and what risks concern them. When every stakeholder sees their own priorities reflected in the solution, <strong>consensus becomes much easier to build.</strong></p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 3
+  ============================================================ -->
+  <section class="chapter" id="ch3">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--slate);"><span style="background:var(--slate)"></span>Chapter 03 · Part I</div>
+      <h2 class="chapter-title"><span class="w300">The Economics of</span> <span class="w700">Any Business</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--slate);">
+      <div class="principle-label">Principle №3</div>
+      <div class="principle-text">Great reps understand their customer's business better than they understand their own product. The best conversations don't begin with software — <em>they begin with economics.</em></div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Lost opportunity can't be recovered</div>
+      <p class="lede">An empty seat on a schedule. An unanswered lead. An hour of staff time spent on something a tool could have done. Once the moment passes, that value can never be recovered — every missed opportunity is revenue that's gone for good.</p>
+      <div class="callout">
+        <span class="tag">A generic revenue equation</span>
+        <p class="mono" style="color:var(--ink);font-size:15px;">Revenue = (New Customers) × (Average Deal Size) × (Retention)</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>How your product might help</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">New Customers</td><td>Better conversion, faster response times, stronger positioning</td></tr>
+            <tr><td class="hl">Average Deal Size</td><td>Upsells, bundles, higher-tier plans, add-ons</td></tr>
+            <tr><td class="hl">Retention</td><td>Renewals, reduced churn, expansion revenue</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lede" style="max-width:760px;">Never describe a feature without naming which part of the equation it improves.</p>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Revenue leaks</div>
+      <p class="lede">Most businesses don't have one large problem — they have dozens of small leaks that quietly reduce profitability.</p>
+      <div class="buckets">
+        <div class="bucket revenue"><span class="label" style="color:var(--slate)">Acquisition</span><p>Weak conversion, abandoned signups, poor mobile experience</p></div>
+        <div class="bucket ops"><span class="label" style="color:var(--ink-faint)">Operational</span><p>Manual discounting, slow onboarding, staff tied up on repetitive work</p></div>
+        <div class="bucket guest"><span class="label" style="color:var(--clay)">Retention</span><p>No upsell strategy, forgotten follow-ups, limited repeat business</p></div>
+        <div class="bucket growth"><span class="label" style="color:var(--forest)">Response</span><p>Slow response to inbound interest</p></div>
+      </div>
+      <p class="lede" style="max-width:760px;">Each leak looks small. Together, they represent substantial lost revenue — your job is to find them.</p>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">The true cost of manual work</div>
+      <div class="callout warn">
+        <span class="tag">Worked example</span>
+        <p><span class="mono" style="color:var(--ink)">25 tasks × 6 minutes = 150 minutes = 2.5 hours / day</span><br>Over a year, that's hundreds of hours doing work customers increasingly expect to happen automatically.</p>
+      </div>
+      <p class="lede" style="max-width:760px;">The better question isn't "can software automate this?" It's <strong>"what higher-value work could your staff do instead?"</strong> Payroll is often the largest controllable expense — adding revenue without adding headcount improves profitability dramatically.</p>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Efficiency beats headcount</div>
+      <div class="dialogue">
+        <div class="line customer"><span class="who">Scenario</span><p>A ten-person team is fully booked in the mornings and 40% utilized in the afternoons.</p></div>
+        <div class="line rep"><span class="who">Diagnosis</span><p>The problem isn't insufficient headcount — it's uneven demand or workload distribution. Better tooling and process optimize utilization before the business needs to hire.</p></div>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Signals worth listening for</div>
+      <div class="card-grid two">
+        <div class="card" style="border-top:3px solid var(--slate);">
+          <h4>Healthy business</h4>
+          <p>Strong direct acquisition, high conversion, efficient staffing, consistent utilization, healthy repeat business, reliable reporting. They still invest — for growth, not survival.</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--clay);">
+          <h4>Signals of opportunity</h4>
+          <p>Manual channels dominate, disconnected systems, frequent errors, paper or spreadsheet workflows, static pricing, heavy reliance on one channel, low repeat business.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pullquote">"Every missed opportunity represents revenue that can never be recovered. Let's look at how your current process affects that." — the feature becomes evidence, not the pitch.</div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Before presenting your product: where is revenue being lost? Which operational bottlenecks reduce profitability? What prevents the business from growing? Which improvements would produce the greatest financial impact?</p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 4
+  ============================================================ -->
+  <section class="chapter" id="ch4">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--forest);"><span style="background:var(--forest)"></span>Chapter 04 · Part I</div>
+      <h2 class="chapter-title"><span class="w300">The</span> <span class="w700">Value Architecture</span></h2>
+    </div>
+
+    <div class="principle-card">
+      <div class="principle-label">Principle №4</div>
+      <div class="principle-text">Customers do not purchase features. They invest in business outcomes — <em>"How will my business be better six months after I buy this?"</em></div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The value chain — this book's throughline</div>
+      <p class="lede" style="max-width:760px;">This is the same climb as the Sales Conversation Pyramid in Chapter 1, seen from the feature side. One idea, worth internalizing until it's automatic — regardless of what you sell.</p>
+      <div class="chain">
+        <div class="chain-step"><span class="n">Automated Onboarding</span><span class="t">Feature</span></div>
+        <div class="chain-step"><span class="n">Customer completes setup unassisted</span><span class="t">Capability</span></div>
+        <div class="chain-step"><span class="n">Faster time-to-value</span><span class="t">Operational Improvement</span></div>
+        <div class="chain-step"><span class="n">More customers activated</span><span class="t">Business Outcome</span></div>
+        <div class="chain-step peak"><span class="n">Lower support cost / happier customers</span><span class="t">Executive KPI</span></div>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Capability map — adapt to your own product</div>
+      <p class="lede" style="max-width:760px;">Swap these for the actual capabilities you sell. What matters is the pattern: capability → outcome → discovery question.</p>
+      <div class="card-grid two">
+        <div class="card cap-card"><h4>Pipeline / CRM Management</h4><span class="k">Outcome</span><p>Fewer dropped leads, better visibility, more predictable forecasting.</p><span class="k">Discovery</span><p>How do you track where each deal stands today?</p></div>
+        <div class="card cap-card"><h4>Automation & Workflows</h4><span class="k">Outcome</span><p>Less manual work, faster turnaround, fewer errors.</p><span class="k">Discovery</span><p>Which tasks does your team repeat every single day?</p></div>
+        <div class="card cap-card"><h4>Reporting & Analytics</h4><span class="k">Outcome</span><p>Better decisions, improved forecasting.</p><span class="k">Discovery</span><p>Which business decisions are hardest to make today?</p></div>
+        <div class="card cap-card"><h4>Integrations / APIs</h4><span class="k">Outcome</span><p>Reduced manual entry, better data quality.</p><span class="k">Discovery</span><p>Where is information entered more than once?</p></div>
+        <div class="card cap-card"><h4>Communication / Messaging</h4><span class="k">Outcome</span><p>Fewer support requests, reduced no-shows or drop-offs.</p><span class="k">Discovery</span><p>Who sends follow-ups and reminders today?</p></div>
+        <div class="card cap-card"><h4>Billing / Payments</h4><span class="k">Outcome</span><p>Faster cash flow, fewer failed payments.</p><span class="k">Discovery</span><p>How much manual work goes into collecting payment?</p></div>
+        <div class="card cap-card"><h4>Onboarding / Activation Tools</h4><span class="k">Outcome</span><p>Faster time-to-value, fewer early churns.</p><span class="k">Discovery</span><p>What happens when a new customer gets stuck early on?</p></div>
+        <div class="card cap-card"><h4>Self-Service / Customer Portal</h4><span class="k">Outcome</span><p>Fewer inbound requests, higher satisfaction.</p><span class="k">Discovery</span><p>What do customers currently have to call or email you for?</p></div>
+        <div class="card cap-card"><h4>Security & Compliance</h4><span class="k">Outcome</span><p>Reduced risk, easier procurement approval.</p><span class="k">Discovery</span><p>What does your security review process look like?</p></div>
+        <div class="card cap-card"><h4>Mobile Access</h4><span class="k">Outcome</span><p>Faster response, work from anywhere.</p><span class="k">Discovery</span><p>How much of your team's work happens away from a desk?</p></div>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Feature → outcome matrix</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Capability</th><th>Operational improvement</th><th>Business outcome</th><th>Executive KPI</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">Pipeline / CRM</td><td>Easier deal tracking</td><td>More deals closed</td><td class="mono">Win Rate</td></tr>
+            <tr><td class="hl">Automation</td><td>Fewer manual steps</td><td>Higher throughput</td><td class="mono">Cycle Time</td></tr>
+            <tr><td class="hl">Reporting</td><td>Better decisions</td><td>Better forecasting</td><td class="mono">Revenue Growth</td></tr>
+            <tr><td class="hl">Messaging</td><td>Better communication</td><td>Fewer no-shows</td><td class="mono">Churn Rate</td></tr>
+            <tr><td class="hl">Billing</td><td>Faster transactions</td><td>Better cash flow</td><td class="mono">Days Sales Outstanding</td></tr>
+            <tr><td class="hl">Onboarding Tools</td><td>Faster activation</td><td>Higher retention</td><td class="mono">Time-to-Value</td></tr>
+            <tr><td class="hl">Self-Service Portal</td><td>Fewer inbound tickets</td><td>Higher CLV</td><td class="mono">Support Cost / Customer</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">The "So What?" test</div>
+      <div class="dialogue">
+        <div class="line rep"><span class="who">Claim</span><p>"Our product offers automated reminders."</p></div>
+        <div class="line customer"><span class="who">So what?</span><p>Customers receive fewer surprises.</p></div>
+        <div class="line customer"><span class="who">So what?</span><p>Fewer no-shows or missed steps.</p></div>
+        <div class="line customer"><span class="who">So what?</span><p>Capacity is utilized more effectively.</p></div>
+        <div class="line customer"><span class="who">So what?</span><p>Revenue increases without additional marketing spend.</p></div>
+      </div>
+      <p class="lede" style="max-width:760px;">Never stop after describing the feature — continue until you've reached business value.</p>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">The Five Whys — worked on "faster onboarding"</div>
+      <ol class="checklist" style="list-style:none;">
+        <li><strong style="color:var(--ink)">Why? </strong>New customers get set up without help.</li>
+        <li><strong style="color:var(--ink)">Why does that matter?</strong> They reach value faster.</li>
+        <li><strong style="color:var(--ink)">Why?</strong> Fewer early cancellations.</li>
+        <li><strong style="color:var(--ink)">Why?</strong> Retention improves.</li>
+        <li><strong style="color:var(--ink)">Why?</strong> Revenue grows without additional acquisition spend — that's the story executives buy.</li>
+      </ol>
+      <p class="lede" style="max-width:760px;">Run this exercise on whatever capability you actually sell — the chain of "why" is what matters, not this specific example.</p>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Every capability should answer three questions: What operational problem does this solve? What business outcome does it improve? Which executive metric gets stronger? <strong>The product is impressive — the business transformation is what customers buy.</strong></p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PART II DIVIDER
+  ============================================================ -->
+  <section class="part-divider" id="part2">
+    <div class="part-inner">
+      <div class="part-roman">Part II</div>
+      <h2 class="part-title">Discovery Masterclass</h2>
+      <p class="part-thesis">Discovery is diagnosis, not a checklist. This is where you build the business case with the customer, instead of for them.</p>
+      <div class="part-chapters">
+        <a class="part-chapter-chip" href="#ch5"><span class="num">Chapter 5</span><span class="name">Discovery Is Diagnosis</span></a>
+        <a class="part-chapter-chip" href="#ch6"><span class="num">Chapter 6</span><span class="name">The Art of Asking Great Questions</span></a>
+        <a class="part-chapter-chip" href="#ch7"><span class="num">Chapter 7</span><span class="name">Listening Like a Consultant</span></a>
+        <a class="part-chapter-chip" href="#ch8"><span class="num">Chapter 8</span><span class="name">The Discovery Canvas</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER 5
+  ============================================================ -->
+  <section class="chapter" id="ch5">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--clay);"><span style="background:var(--clay)"></span>Chapter 05 · Part II</div>
+      <h2 class="chapter-title"><span class="w300">Discovery Is</span> <span class="w700">Diagnosis</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--clay);">
+      <div class="principle-label">Principle №5</div>
+      <div class="principle-text">The purpose of discovery is not to collect information. It's to <em>uncover the business reasons that justify change.</em></div>
+    </div>
+
+    <div class="section-block">
+      <p class="lede">The average rep asks questions to prepare a demo. The best rep asks questions to build a business case. Customers rarely buy because the demo was impressive — they buy because, during discovery, they recognized their current way of operating is limiting the business.</p>
+      <div class="dialogue">
+        <div class="line rep"><span class="who">Feature-oriented</span><p>"Are you looking for a better tool for X?"</p></div>
+        <div class="line rep"><span class="who">Business-oriented</span><p>"Tell me about the business you're trying to build over the next two years."</p></div>
+      </div>
+      <p class="lede">The second question invites a strategic conversation rather than a product evaluation.</p>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The five-stage discovery framework</div>
+      <div class="stage-flow">
+        <div class="stage">
+          <div class="idx">1</div>
+          <div><h4>Understand the Business</h4><p>Context, not qualification.</p>
+            <div class="qs"><span class="qtag">What makes your business or team unique?</span><span class="qtag">How does seasonality or cyclicality affect you?</span><span class="qtag">What growth goals do you have?</span></div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="idx">2</div>
+          <div><h4>Explore Current Operations</h4><p>Learn how work actually gets done — people build workarounds that reveal the real opportunity.</p>
+            <div class="qs"><span class="qtag">Walk me through this process today.</span><span class="qtag">How is this tracked or managed today?</span><span class="qtag">How are reports generated?</span></div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="idx">3</div>
+          <div><h4>Identify Business Challenges</h4><p>Explore every challenge from three angles: Operational ("What's happening?"), Business ("What impact does it have?"), Personal ("Why does that matter to you?").</p></div>
+        </div>
+        <div class="stage">
+          <div class="idx">4</div>
+          <div><h4>Quantify the Impact</h4><p>Problems become priorities when they can be measured. Numbers create urgency.</p>
+            <div class="qs"><span class="qtag">Which part of this is hardest to manage?</span><span class="qtag">How much revenue or time is lost?</span></div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="idx">5</div>
+          <div><h4>Define Success</h4><p>Success should be defined by the customer, not the vendor.</p>
+            <div class="qs"><span class="qtag">What would your team notice first?</span><span class="qtag">What would your customers notice?</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Rule of Three</div>
+      <p class="lede">Every important challenge deserves at least three follow-up questions.</p>
+      <div class="dialogue">
+        <div class="line customer"><span class="who">Customer</span><p>"We struggle with follow-up."</p></div>
+        <div class="line rep"><span class="who">Q1</span><p>What causes most of those delays?</p></div>
+        <div class="line rep"><span class="who">Q2</span><p>What happens operationally when a lead goes cold?</p></div>
+        <div class="line rep"><span class="who">Q3</span><p>How does that affect revenue?</p></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Common discovery mistakes</div>
+      <ul class="checklist">
+        <li><strong style="color:var(--ink)">Talking too early.</strong> The temptation to demo before understanding the business is strong. Resist it.</li>
+        <li><strong style="color:var(--ink)">Accepting surface-level answers.</strong> "We want better reporting" isn't a stopping point.</li>
+        <li><strong style="color:var(--ink)">Too many closed questions.</strong> "Do you use X?" closes a door — "tell me about..." opens it.</li>
+        <li><strong style="color:var(--ink)">Solving too soon.</strong> Pause. Explore. Understand. Then recommend.</li>
+      </ul>
+      <div class="callout">
+        <span class="tag">The Discovery Ratio</span>
+        <p>Customer speaks 70%. Rep speaks 30%. Your value comes from asking thoughtful questions, not delivering long explanations.</p>
+      </div>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Discovery is successful when you can confidently answer: What's the customer's most important objective? What's preventing it? What's the measurable cost? Why act now? How will they define success? <strong>A well-run discovery is the foundation for every proposal, demo, and negotiation that follows.</strong></p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 6
+  ============================================================ -->
+  <section class="chapter" id="ch6">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--clay);"><span style="background:var(--clay)"></span>Chapter 06 · Part II</div>
+      <h2 class="chapter-title"><span class="w300">The Art of Asking</span> <span class="w700">Great Questions</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--clay);">
+      <div class="principle-label">Principle №6</div>
+      <div class="principle-text">Great questions don't gather information. <em>They change the way customers think.</em></div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The five layers of discovery</div>
+      <div class="layers">
+        <div class="layer layer1"><div class="lt">1 · Facts</div><p class="ld">How many people are on your team? How many customers a year? Establishes context — rarely creates urgency on its own.</p></div>
+        <div class="layer layer2"><div class="lt">2 · Processes</div><p class="ld">"Walk me through a typical week." Don't interrupt — customers reveal inefficiencies unprompted.</p></div>
+        <div class="layer layer3"><div class="lt">3 · Problems</div><p class="ld">"Which part of that frustrates your team most?" Customers often minimize their own problems.</p></div>
+        <div class="layer layer4"><div class="lt">4 · Business Impact</div><p class="ld">"What does that cost the business?" Numbers create credibility.</p></div>
+        <div class="layer layer5"><div class="lt">5 · Personal Impact</div><p class="ld">"Why is solving this important to you?" Most reps never reach this layer — but businesses don't decide, people do.</p></div>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Replace feature questions with business questions</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Instead of...</th><th>Ask...</th></tr></thead>
+          <tbody>
+            <tr><td>Do you need automation?</td><td class="hl">What happens when your team falls behind on manual tasks?</td></tr>
+            <tr><td>Do you use a CRM?</td><td class="hl">How do you track where each deal or lead stands today?</td></tr>
+            <tr><td>Do you have reporting?</td><td class="hl">Which business decisions are hardest to make today?</td></tr>
+            <tr><td>Do you need integrations?</td><td class="hl">Which systems require manual data entry between them?</td></tr>
+            <tr><td>Do you have dynamic pricing?</td><td class="hl">How do you decide when pricing or discounting should change?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Follow the energy, sit in the silence</div>
+      <p class="lede">"Honestly, the requests never stop coming in." Pause. Explore. Don't rush to fill silence after a hard question — the strongest answers often arrive after a few seconds of reflection, and many of the best insights come in what a customer adds after you've said nothing.</p>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Reading between the lines</div>
+      <div class="dialogue">
+        <div class="line customer"><span class="who">They say</span><p>"Our team has gotten really good at handling this manually."</p></div>
+        <div class="line rep"><span class="who">Translation</span><p>We do far more manual work than we'd like.</p></div>
+        <div class="line customer"><span class="who">They say</span><p>"We have a spreadsheet for that."</p></div>
+        <div class="line rep"><span class="who">Translation</span><p>Our current tools don't support this process.</p></div>
+      </div>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Curiosity beats expertise. Stories beat checklists. Open questions beat closed ones. Impact beats features. Silence creates insight. <strong>Every answer deserves a thoughtful follow-up.</strong></p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 7
+  ============================================================ -->
+  <section class="chapter" id="ch7">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--clay);"><span style="background:var(--clay)"></span>Chapter 07 · Part II</div>
+      <h2 class="chapter-title"><span class="w300">Listening Like a</span> <span class="w700">Consultant</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--clay);">
+      <div class="principle-label">Principle №7</div>
+      <div class="principle-text">Customers don't trust you because you have good answers. <em>They trust you because they feel understood.</em></div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Three levels of listening</div>
+      <div class="dialogue">
+        <div class="line customer"><span class="who">Customer says</span><p>"We still handle quite a few of these manually, by phone or email."</p></div>
+        <div class="line rep"><span class="who">Level 1 — What they say</span><p>Manual handling.</p></div>
+        <div class="line rep"><span class="who">Level 2 — What they mean</span><p>The automated process isn't working well enough.</p></div>
+        <div class="line rep"><span class="who">Level 3 — Why it matters</span><p>Labor costs are unnecessarily high; conversion may be poor.</p></div>
+      </div>
+      <p class="lede">The opportunity isn't the manual channel — it's operational leverage. Your goal is to reach Level 3.</p>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Sort everything into four buckets</div>
+      <div class="buckets">
+        <div class="bucket revenue"><span class="label" style="color:var(--slate)">Revenue</span><p>Empty capacity, excessive discounting, weak upsells</p></div>
+        <div class="bucket ops"><span class="label" style="color:var(--ink-faint)">Operations</span><p>Manual scheduling, paper or spreadsheet processes</p></div>
+        <div class="bucket guest"><span class="label" style="color:var(--clay)">Customer Experience</span><p>Long onboarding, poor communication</p></div>
+        <div class="bucket growth"><span class="label" style="color:var(--forest)">Growth</span><p>New market, forecasting, staffing</p></div>
+      </div>
+      <p class="lede" style="max-width:760px;">If a comment doesn't fit a bucket, ask another question. Instead of isolated notes — "manual data entry, slow onboarding, spreadsheet tracking" — recognize the pattern: <strong>Manual Operations.</strong></p>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Signals to catch in real time</div>
+      <div class="card-grid two">
+        <div class="card" style="border-top:3px solid var(--slate);"><h4>Buying signals</h4><p>"There has to be a better way." "We've outgrown our current process." "We can't keep doing it this way." — invitations to discuss change.</p></div>
+        <div class="card" style="border-top:3px solid var(--clay);"><h4>Risk signals</h4><p>"Switching sounds painful." "Our team won't like this." "We've been burned before." Don't argue — explore.</p></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Mirror, summarize, label</div>
+      <p class="lede">Occasionally repeat the customer's own words back to create space without interrupting flow. Then summarize often — a good summary confirms understanding, corrects misreads, and builds trust. When customers describe symptoms, give them language for the pattern: <em>"It sounds like manual processes are preventing your team from scaling."</em> That language often reappears later in the sales cycle.</p>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Listen for patterns, not isolated facts. Organize into business themes. Summarize often. Use the customer's own language. <strong>When customers hear their business described more clearly than they could describe it themselves, you've become a trusted advisor.</strong></p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 8
+  ============================================================ -->
+  <section class="chapter" id="ch8">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--clay);"><span style="background:var(--clay)"></span>Chapter 08 · Part II</div>
+      <h2 class="chapter-title"><span class="w300">The</span> <span class="w700">Discovery Canvas</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--clay);">
+      <div class="principle-label">Principle №8</div>
+      <div class="principle-text">Great discovery produces clarity. <em>If you can't summarize the business on one page, you aren't ready to recommend a solution.</em></div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The canvas, at a glance</div>
+      <div class="canvas-grid">
+        <div class="canvas-cell"><span class="num">01</span><h5>Company Snapshot</h5><ul><li>Primary offering</li><li>Team size & scale</li><li>Seasonality / cyclicality pattern</li></ul></div>
+        <div class="canvas-cell"><span class="num">02</span><h5>Why Now?</h5><ul><li>Growth / expansion</li><li>Current tool's limitations</li><li>Customer's own words</li></ul></div>
+        <div class="canvas-cell"><span class="num">03</span><h5>Business Objectives</h5><ul><li>Ranked 1–4 by leadership</li></ul></div>
+        <div class="canvas-cell"><span class="num">04</span><h5>Revenue</h5><ul><li>Lost conversion, low utilization</li><li>Evidence + est. financial impact</li></ul></div>
+        <div class="canvas-cell"><span class="num">05</span><h5>Operations</h5><ul><li>Manual tasks, disconnected tools</li><li>Evidence + est. operational impact</li></ul></div>
+        <div class="canvas-cell"><span class="num">06</span><h5>Customer Experience</h5><ul><li>Slow onboarding, poor comms</li><li>Evidence + customer impact</li></ul></div>
+        <div class="canvas-cell"><span class="num">07</span><h5>Growth</h5><ul><li>New market, forecasting</li><li>Supporting evidence</li></ul></div>
+        <div class="canvas-cell"><span class="num">08</span><h5>Stakeholders</h5><ul><li>Name · Role · Success means · Concerns</li></ul></div>
+        <div class="canvas-cell"><span class="num">09</span><h5>Current Technology</h5><ul><li>CRM · Payments · Marketing · Support</li></ul></div>
+        <div class="canvas-cell"><span class="num">10</span><h5>Current Process</h5><ul><li>Lead → Qualification → Proposal → Close → Onboarding → Renewal</li></ul></div>
+        <div class="canvas-cell"><span class="num">11</span><h5>Reasons to Change</h5><ul><li>In the customer's own words</li></ul></div>
+        <div class="canvas-cell"><span class="num">12</span><h5>Reasons to Stay</h5><ul><li>Migration fear, contract, staff resistance</li></ul></div>
+        <div class="canvas-cell"><span class="num">13</span><h5>Business Impact</h5><ul><li>Revenue · Labor savings · Time saved</li></ul></div>
+        <div class="canvas-cell"><span class="num">14</span><h5>Success Criteria</h5><ul><li>"12 months after implementation, success means..."</li></ul></div>
+        <div class="canvas-cell" style="border-color:rgba(166,84,63,0.5);background:rgba(166,84,63,0.06);"><span class="num">15</span><h5>Executive Summary</h5><ul><li>Evaluating us because... / Biggest problem is... / We help by...</li></ul></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Discovery readiness checklist</div>
+      <ul class="checklist">
+        <li>Why are they changing? Why now? What happens if they don't?</li>
+        <li>Who benefits? Who might resist?</li>
+        <li>What metrics define success?</li>
+        <li>Which three capabilities and business outcomes matter most?</li>
+        <li>How will ROI be measured?</li>
+      </ul>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Discovery isn't complete when you've asked enough questions — it's complete when you can tell the customer's story clearly, accurately, and concisely. <strong>Complete the canvas well, and every stage that follows becomes dramatically easier.</strong></p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PART III DIVIDER
+  ============================================================ -->
+  <section class="part-divider" id="part3">
+    <div class="part-inner">
+      <div class="part-roman">Part III</div>
+      <h2 class="part-title">Business Development</h2>
+      <p class="part-thesis">The pipeline engine: qualified prospecting, territory intention, outreach that earns a reply, and knowing which opportunities deserve your time.</p>
+      <div class="part-chapters">
+        <a class="part-chapter-chip" href="#ch9"><span class="num">Chapter 9</span><span class="name">The BDR Mindset & Qualified Prospecting</span></a>
+        <a class="part-chapter-chip" href="#ch10"><span class="num">Chapter 10</span><span class="name">Territory Planning & Account Prioritization</span></a>
+        <a class="part-chapter-chip" href="#ch11"><span class="num">Chapter 11</span><span class="name">Writing Cold Outreach</span></a>
+        <a class="part-chapter-chip" href="#ch12"><span class="num">Chapter 12</span><span class="name">Cold Calling That Creates Curiosity</span></a>
+        <a class="part-chapter-chip" href="#ch13"><span class="num">Chapter 13</span><span class="name">Qualification</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER 9
+  ============================================================ -->
+  <section class="chapter" id="ch9">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--slate);"><span style="background:var(--slate)"></span>Chapter 09 · Part III</div>
+      <h2 class="chapter-title"><span class="w300">The BDR Mindset & </span> <span class="w700">Qualified Prospecting</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--slate);">
+      <div class="principle-label">Opening thesis</div>
+      <div class="principle-text">A BDR's job is not to book meetings. It's to create <em>well-qualified opportunities</em> that deserve an AE's time — the outcome is curiosity strong enough that the buyer wants to keep talking.</div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The four signals of a good prospect</div>
+      <div class="card-grid">
+        <div class="card" style="border-top:3px solid var(--slate);"><h4>Growth</h4><p>Opening new offices or markets, hiring, expanding hours, adding new products or services.</p></div>
+        <div class="card" style="border-top:3px solid var(--ink-faint);"><h4>Operational Complexity</h4><p>Multiple locations, multiple channels, large seasonal teams, high volume.</p></div>
+        <div class="card" style="border-top:3px solid var(--clay);"><h4>Revenue Opportunity</h4><p>Heavy reliance on one channel, empty capacity, poor online experience, weak repeat business.</p></div>
+        <div class="card" style="border-top:3px solid var(--forest);"><h4>Technology Trigger</h4><p>Legacy tooling, spreadsheet workflows, recent funding, website redesign, new leadership.</p></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Cold call framework — fill in your own product</div>
+      <div class="email-card">
+        <div class="email-head"><span class="subj">Opening</span></div>
+        <div class="email-body"><p>"I'm reaching out because we work with [companies like theirs] trying to [outcome your product enables] while reducing the operational work that comes with growth. I was curious how you're handling that today."</p></div>
+      </div>
+      <div class="callout">
+        <span class="tag">If they're busy</span>
+        <p>"I completely understand. Before I let you go — what's the biggest operational challenge your team faces right now?" One good answer is often enough to earn another conversation.</p>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">BDR success metrics</div>
+      <p class="lede">Measure more than meetings booked: qualified meetings held, discovery quality, opportunity acceptance rate, pipeline generated, progression to demo/proposal, closed-won revenue sourced. <strong>A meeting that never progresses isn't a successful meeting.</strong></p>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Before handing off an opportunity: why are they willing to meet? What business challenge have they acknowledged? Why now? Who will attend? A five-minute handoff summary saves twenty minutes of rediscovery.</p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 10
+  ============================================================ -->
+  <section class="chapter" id="ch10">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--slate);"><span style="background:var(--slate)"></span>Chapter 10 · Part III</div>
+      <h2 class="chapter-title"><span class="w300">Territory Planning &</span> <span class="w700">Account Prioritization</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--slate);">
+      <div class="principle-label">Principle №9</div>
+      <div class="principle-text">Great salespeople don't prospect more. <em>They prospect with intention.</em></div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The prospecting pyramid</div>
+      <div class="tiers">
+        <div class="tier tier1"><div class="th"><span class="badge">Tier 1</span><h4>Strategic Accounts</h4></div><p>Multiple locations, growing rapidly, strong online presence, high volume, existing tech limitations. Deep research, fully personalized outreach.</p></div>
+        <div class="tier tier2"><div class="th"><span class="badge">Tier 2</span><h4>Growth Accounts</h4></div><p>Single location, growing demand, operational pain, small management teams — these opportunities often move faster. Semi-personalized outreach.</p></div>
+        <div class="tier tier3"><div class="th"><span class="badge">Tier 3</span><h4>Future Opportunities</h4></div><p>Newly launched, seasonal, very small teams, limited online presence. Not yet ready — stay connected, timing changes.</p></div>
+      </div>
+      <p class="lede" style="max-width:760px;">The strongest opportunities combine three characteristics: <strong>Growth, Operational Friction, and Revenue Opportunity.</strong> Growth creates complexity; complexity creates demand for better systems.</p>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Prioritization matrix</div>
+      <div class="pbars">
+        <div class="pbar-row"><span class="lab">Revenue Potential</span><div class="pbar-track"><div class="pbar-fill" style="width:60%"></div></div><span class="val">30%</span></div>
+        <div class="pbar-row"><span class="lab">Operational Complexity</span><div class="pbar-track"><div class="pbar-fill" style="width:60%"></div></div><span class="val">30%</span></div>
+        <div class="pbar-row"><span class="lab">Growth Signals</span><div class="pbar-track"><div class="pbar-fill" style="width:40%"></div></div><span class="val">20%</span></div>
+        <div class="pbar-row"><span class="lab">Technology Fit</span><div class="pbar-track"><div class="pbar-fill" style="width:40%"></div></div><span class="val">20%</span></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Reading reviews and job posts like a salesperson</div>
+      <div class="dialogue">
+        <div class="line customer"><span class="who">Review says</span><p>"Onboarding took forever."</p></div>
+        <div class="line rep"><span class="who">Signal</span><p>Automated onboarding or activation opportunity.</p></div>
+        <div class="line customer"><span class="who">Job post says</span><p>"We're hiring an operations manager."</p></div>
+        <div class="line rep"><span class="who">Signal</span><p>Operational complexity is increasing.</p></div>
+      </div>
+      <div class="callout">
+        <span class="tag">Trigger events worth watching</span>
+        <p>New ownership or leadership, new funding, website redesign, expansion, increased hiring, competitive changes. Reach out while change is already happening.</p>
+      </div>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Prospecting begins long before the first call or email — it begins with understanding the business. <strong>Better research → better questions → better discovery.</strong></p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 11
+  ============================================================ -->
+  <section class="chapter" id="ch11">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--slate);"><span style="background:var(--slate)"></span>Chapter 11 · Part III</div>
+      <h2 class="chapter-title"><span class="w300">Writing Cold Outreach</span> <span class="w700">That Earns a Conversation</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--slate);">
+      <div class="principle-label">Principle №10</div>
+      <div class="principle-text">The purpose of cold outreach is not to sell your product. <em>It's to earn the next conversation.</em></div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Every message answers five questions</div>
+      <div class="card-grid">
+        <div class="card"><h4>Why this company?</h4><p>Recent expansion, new offerings, strong online reputation, growth announcements.</p></div>
+        <div class="card"><h4>Why this person?</h4><p>Owner → growth. Ops leader → efficiency. Marketing → pipeline.</p></div>
+        <div class="card"><h4>Why now?</h4><p>Busy season approaching, new location opening, budget cycle.</p></div>
+        <div class="card"><h4>Why should they care?</h4><p>Lead with a business challenge, never a feature.</p></div>
+        <div class="card"><h4>Why continue?</h4><p>Give a reason to reply — the discussion might solve a meaningful problem.</p></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Three rules of cold outreach</div>
+      <ul class="checklist">
+        <li>Write for someone reading on their phone — short paragraphs, simple language.</li>
+        <li>Focus on one idea per message.</li>
+        <li>End with a question. Questions invite conversation — statements invite deletion.</li>
+      </ul>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Example email — swap in your own product</div>
+      <div class="email-card">
+        <div class="email-head"><span class="subj">Subject: Question about [relevant business challenge]</span></div>
+        <div class="email-body">
+          <p>Hi [Name],</p>
+          <p>I came across [their company] while researching [their industry / segment].</p>
+          <p>Many teams we speak with have strong [strength area] but struggle with [specific operational challenge] without relying heavily on [current workaround].</p>
+          <p>I'm curious: how does your team approach that today?</p>
+          <p>If it's helpful, I'd be happy to share a few approaches we've seen other companies use.</p>
+          <p style="color:var(--ink-faint);font-size:13px;">Best, [Your Name] — Business Development Representative, [Your Company]</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">A multi-channel sequence</div>
+      <div class="cadence">
+        <div class="cad-step"><span class="day">Day 1</span><p>Personalized email</p></div>
+        <div class="cad-step"><span class="day">Day 2</span><p>LinkedIn profile visit</p></div>
+        <div class="cad-step"><span class="day">Day 3</span><p>Phone call</p></div>
+        <div class="cad-step"><span class="day">Day 5</span><p>LinkedIn connection request</p></div>
+        <div class="cad-step"><span class="day">Day 7</span><p>Follow-up email with insight</p></div>
+        <div class="cad-step"><span class="day">Day 10</span><p>Phone call</p></div>
+        <div class="cad-step"><span class="day">Day 14</span><p>Share relevant case study</p></div>
+        <div class="cad-step"><span class="day">Day 18</span><p>Break-up email</p></div>
+      </div>
+      <p class="lede" style="max-width:760px;">Each touch should provide a reason to engage — never repeat the same message.</p>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Manager review checklist</span>
+      <p>Would this message feel personal if I received it? Does it demonstrate research? Does it start with a business problem, not a feature list? <strong>Could the product name be removed and the message still make sense?</strong></p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 12
+  ============================================================ -->
+  <section class="chapter" id="ch12">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--slate);"><span style="background:var(--slate)"></span>Chapter 12 · Part III</div>
+      <h2 class="chapter-title"><span class="w300">Cold Calling That</span> <span class="w700">Creates Curiosity</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--slate);">
+      <div class="principle-label">Principle №11</div>
+      <div class="principle-text">The objective of a cold call is not to close a deal. <em>It's to earn the next meaningful conversation.</em></div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The four stages of every cold call</div>
+      <div class="chain">
+        <div class="chain-step"><span class="n">Stage 1</span><span class="t">Permission<br><span style="font-weight:400;color:var(--ink-faint);font-size:12.5px;">Lower resistance first</span></span></div>
+        <div class="chain-step"><span class="n">Stage 2</span><span class="t">Curiosity<br><span style="font-weight:400;color:var(--ink-faint);font-size:12.5px;">No product, no pitch</span></span></div>
+        <div class="chain-step"><span class="n">Stage 3</span><span class="t">Discovery<br><span style="font-weight:400;color:var(--ink-faint);font-size:12.5px;">Listen more than speak</span></span></div>
+        <div class="chain-step peak"><span class="n">Stage 4</span><span class="t">Next Step<br><span style="font-weight:400;color:var(--ink-dim);font-size:12.5px;">A continuation, not the goal</span></span></div>
+      </div>
+      <div class="callout">
+        <span class="tag">Opening line</span>
+        <p>"Hi [Name], this is [Your Name] with [Your Company]. I know I wasn't expected today, so I'll be brief. Have I caught you at an impossible time?" Avoid "Do you have a minute?" — most people instinctively say no.</p>
+      </div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Navigating common responses</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>They say</th><th>You do</th></tr></thead>
+          <tbody>
+            <tr><td class="hl">"We're happy with our current system."</td><td>Don't challenge it — explore it. "What do you like most about it? If you could improve one thing, what would it be?"</td></tr>
+            <tr><td class="hl">"We're too busy."</td><td>Acknowledge it, then ask one high-value question before letting them go.</td></tr>
+            <tr><td class="hl">"Just send me information."</td><td>Ask what prompted their interest first, so what you send is actually useful.</td></tr>
+            <tr><td class="hl">"We're not interested."</td><td>Stay curious — happy with the current approach, or just not a priority right now?</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lede" style="max-width:760px;">This is the same list as the battlecard at the front of the book — see it there for the full 12-objection quick reference.</p>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Manager coaching lens</div>
+      <p class="lede">Review recorded calls for: Did the rep earn permission? Demonstrate preparation? Ask open-ended questions? Uncover a measurable business problem? Summarize before asking for a meeting? <strong>Coach behaviors, not scripts.</strong></p>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Chapter takeaways</span>
+      <p>Cold calling isn't about overcoming resistance — it's about reducing it. Lead with curiosity, listen with intent. <strong>If the customer finishes the call feeling heard instead of pitched, you've created the conditions for a productive sales conversation.</strong></p>
+    </div>
+  </section>
+  <div class="ch-end"></div>
+
+  <!-- ============================================================
+       CHAPTER 13
+  ============================================================ -->
+  <section class="chapter" id="ch13" style="padding-bottom:60px;">
+    <div class="chapter-head">
+      <div class="ch-eyebrow" style="color:var(--slate);"><span style="background:var(--slate)"></span>Chapter 13 · Part III</div>
+      <h2 class="chapter-title"><span class="w300">Qualification: Deciding Which</span> <span class="w700">Opportunities Deserve Your Time</span></h2>
+    </div>
+
+    <div class="principle-card" style="border-left-color:var(--slate);">
+      <div class="principle-label">Principle №12</div>
+      <div class="principle-text">Every "yes" to the wrong opportunity is a "no" to the right one. <em>Qualification protects the customer's time and your team's time.</em></div>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">The five qualification pillars</div>
+      <div class="pillars">
+        <div class="pillar"><span class="num">01</span><h5>Business Value</h5><p>Is there a meaningful problem to solve?</p></div>
+        <div class="pillar"><span class="num">02</span><h5>Urgency</h5><p>Why now, not in six months?</p></div>
+        <div class="pillar"><span class="num">03</span><h5>Stakeholders</h5><p>Who influences the decision?</p></div>
+        <div class="pillar"><span class="num">04</span><h5>Capability Fit</h5><p>Does your product solve the real challenge?</p></div>
+        <div class="pillar"><span class="num">05</span><h5>Commitment</h5><p>Shown through action, not interest.</p></div>
+      </div>
+      <p class="lede" style="max-width:760px;">Weakness in one area doesn't automatically disqualify a deal — but several weak areas together usually indicate a deal that will stall.</p>
+    </div>
+
+    <div class="section-block wide">
+      <div class="block-h">Recognizing quality — and red flags</div>
+      <div class="card-grid two">
+        <div class="card" style="border-top:3px solid var(--slate);">
+          <h4>High-quality opportunity</h4>
+          <p>Customer clearly describes the problem, understands the business impact, has executive support, is willing to invest time, has a realistic implementation window, and sees change as necessary.</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--clay);">
+          <h4>Weak opportunity</h4>
+          <p>"We're just looking." "We're collecting information." "Maybe next year." "Nothing is really broken." Curiosity is valuable — without a business driver, it rarely becomes a purchase.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">Worked example</div>
+      <div class="dialogue">
+        <div class="line customer"><span class="who">Customer</span><p>"We're opening a second location next spring."</p></div>
+        <div class="line rep"><span class="who">Strong signals</span><p>Growth initiative, increasing complexity, clear timeline.</p></div>
+        <div class="line rep"><span class="who">Discovery reveals</span><p>Manual scheduling, phone-heavy intake, limited reporting — strong Business Value, Urgency, and Capability Fit. The next step is appropriate.</p></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="block-h">When to walk away</div>
+      <ul class="checklist">
+        <li>No meaningful business challenge</li>
+        <li>No access to decision makers</li>
+        <li>No willingness to continue discovery</li>
+        <li>No realistic timeline</li>
+        <li>Clear mismatch between customer needs and your product's strengths</li>
+      </ul>
+      <div class="callout">
+        <span class="tag">Manager coaching</span>
+        <p>Rather than "What's the probability this deal closes?" ask "What evidence supports that probability?" Evidence is stronger than optimism.</p>
+      </div>
+    </div>
+
+    <div class="ch-summary">
+      <span class="tag">Book closing note</span>
+      <p>Qualification isn't about deciding whether a prospect is good enough for your product — it's about determining whether your product is the right solution for the customer's business, at the right time. <strong>The most successful reps don't chase every opportunity. They invest deeply in the opportunities where they can create the greatest value.</strong></p>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="brand-mark">
+      <span class="dot"></span>
+      <span>The Outbound Playbook<br><small>Sales Enablement — Universal Edition</small></span>
+    </div>
+    <div class="colophon">
+      A Field Guide for Any BDR / Inside Sales Rep<br>
+      Battlecard · Part I — The Sales Philosophy · Part II — Discovery Masterclass · Part III — Business Development<br>
+      13 Chapters · 12 Principles · Built for Account Executives & BDRs, in any industry
+    </div>
+  </footer>
+
+  </div><!-- /main-col -->
+</div><!-- /layout -->
+
+<script>
+// Mobile TOC toggle
+const navToggle = document.getElementById('navToggle');
+const sideToc = document.getElementById('sideToc');
+navToggle && navToggle.addEventListener('click', () => {
+  sideToc.classList.toggle('open');
+});
+document.querySelectorAll('#sideToc a').forEach(a=>{
+  a.addEventListener('click', ()=> sideToc.classList.remove('open'));
+});
+
+// Scrollspy
+const sections = document.querySelectorAll('.chapter[id], .battlecard[id]');
+const tocLinks = document.querySelectorAll('[data-toc]');
+const topLinks = document.querySelectorAll('.topnav-links a');
+
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const id = entry.target.id;
+      tocLinks.forEach(l=> l.classList.toggle('active', l.getAttribute('href') === '#'+id));
+    }
+  });
+},{ rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+
+sections.forEach(s => observer.observe(s));
+
+const partSections = document.querySelectorAll('.part-divider[id], .battlecard[id]');
+const partObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const id = entry.target.id;
+      topLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+id));
+    }
+  });
+},{ rootMargin: '-40% 0px -50% 0px', threshold:0 });
+partSections.forEach(s=>partObserver.observe(s));
+</script>
+</body>
+</html>
